@@ -1,2 +1,2 @@
-# ScALP_laser
-Laser projector rpi scripts for webcam analysis and data pipeliens.
+# opencv_canny_webcam
+Running a python script to analyze edge detection on a loop.
