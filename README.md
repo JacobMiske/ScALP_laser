@@ -1,2 +1,3 @@
-# opencv_canny_webcam
-Running a python script to analyze edge detection on a loop.
+# Scanning Art Laser Projector
+
+For an experimental art project with a white laser and galvo mirrors. 
