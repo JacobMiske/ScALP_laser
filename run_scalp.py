@@ -38,16 +38,25 @@ class ScALP(cmd.Cmd):
     '''
     Takes a frame from the webcam
     '''
+    pass
+
+	
+  def do_xy(self, arg):
+    '''
+    From a frame, creates lists of x and y point of images
+    '''
     cam = cv2.VideoCapture(0)
     # Open USB webcam in cv2 and take a picture then release camera
     cam.open(0)
-    retval, image = cam.retrieve()
+    retval, image = cam.read()
     cam.release()
+    time.sleep(1)
     cv2.imwrite('/home/pi/Desktop/ScALP/ScALP_laser/test.jpg', image)
+    time.sleep(1)
     img = cv2.imread('/home/pi/Desktop/ScALP/ScALP_laser/test.jpg', 0)
 
     ## cv2.imshow('image', img)
-    ## cv2.waitKeys(0)
+    ## cv2.waitKey(0)
     ## cv2.destroyAllWindows()
     
     # Run edge detection, edges is a numpy.ndarray
@@ -55,26 +64,21 @@ class ScALP(cmd.Cmd):
     print(type(edges))
     print(edges)
     edge_nz = np.nonzero(edges)
-    print('Indices of non-zero elements: ', edge_nz)
+    print('Indices of edge x,y elements: ', edge_nz)
     time.sleep(1)
-
-	
-  def do_x_y(self, arg):
-    '''
-    From a frame, creates lists of x and y point of images
-    '''
-    pass
     
 
-  def do_x_y(self, arg):
+  def do_drivexy(self, arg):
     '''
     Drives the digital signal to send the laser to
-    a specific point. Can be called <=800 times a second
+    a specific point. Can be called <=800 times a second.
+    Uses a list of x and y points.
     '''
+    
     pass
 
 
-  def do_colorpick(self, arg, r,g,b):
+  def do_colorpick(self, arg):
     '''
     Drives the digital signal to achieve the correct
     RGB color on the white laser
