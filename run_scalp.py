@@ -18,16 +18,19 @@ class ScALP(cmd.Cmd):
   
   def do_webcam(self, arg):
     '''
-    Initialize the webcam, take a test frame
+    Initialize the webcam, take a test frame for 5 seconds
     '''
     cam = cv2.VideoCapture(0)
     
     ret, image = cam.read()
     if ret:
+      # Create window to show image
       cv2.imshow('test', image)
+      # Show window for 5 seconds
       cv2.waitKey(5000)
       cv2.destroyWindow('test')
-      cv2.imwrite('/home/pi/test.jpg', image)
+      # Write image to Desktop
+      cv2.imwrite('/home/pi/Desktop/ScALP/ScALP_laser/test.jpg', image)
     cam.release()
     pass
 	
@@ -35,7 +38,25 @@ class ScALP(cmd.Cmd):
     '''
     Takes a frame from the webcam
     '''
-    pass
+    cam = cv2.VideoCapture(0)
+    # Open USB webcam in cv2 and take a picture then release camera
+    cam.open(0)
+    retval, image = cam.retrieve()
+    cam.release()
+    cv2.imwrite('/home/pi/Desktop/ScALP/ScALP_laser/test.jpg', image)
+    img = cv2.imread('/home/pi/Desktop/ScALP/ScALP_laser/test.jpg', 0)
+
+    ## cv2.imshow('image', img)
+    ## cv2.waitKeys(0)
+    ## cv2.destroyAllWindows()
+    
+    # Run edge detection, edges is a numpy.ndarray
+    edges = cv2.Canny(img, 100, 200)
+    print(type(edges))
+    print(edges)
+    edge_nz = np.nonzero(edges)
+    print('Indices of non-zero elements: ', edge_nz)
+    time.sleep(1)
 
 	
   def do_x_y(self, arg):
@@ -43,7 +64,7 @@ class ScALP(cmd.Cmd):
     From a frame, creates lists of x and y point of images
     '''
     pass
-	
+    
 
   def do_x_y(self, arg):
     '''
