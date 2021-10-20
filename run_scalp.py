@@ -13,6 +13,14 @@ import cv2
 import cmd
 from pyfiglet import Figlet
 
+raspberry_pi = False
+
+if raspberry_pi:
+  import spidev
+  spi = spidev.SpiDev(0, 1)
+  spi.max_speed_hz = 250000
+
+
 class ScALP(cmd.Cmd):
   custom_fig = Figlet(font='slant')
   intro = 'Welcome to the ScALP CLI for Raspberry Pi \n'
@@ -20,6 +28,7 @@ class ScALP(cmd.Cmd):
   file = None
   print(custom_fig.renderText(' ScALP '))
   
+
   def do_background(self, arg):
     """
     Generate background video
@@ -55,6 +64,7 @@ class ScALP(cmd.Cmd):
     result.release()
     cv2.destroyAllWindows()
 	
+
   def do_frame(self, arg):
     """
     Based on background, take short video with subject and run subtraction
@@ -142,6 +152,7 @@ class ScALP(cmd.Cmd):
     #       break
     cv2.destroyAllWindows()
 
+
   def do_xyRGB(self, arg):
     """
     Similar to do_xy but looks at whole RGB
@@ -189,6 +200,7 @@ class ScALP(cmd.Cmd):
     cv2.imwrite('./label_bw_filled_in_RGB.jpg', image_bw)
     cv2.destroyAllWindows()
 
+
   def do_drivexy(self, arg):
     '''
     Drives the digital signal to send the laser to
@@ -202,6 +214,7 @@ class ScALP(cmd.Cmd):
     """
     Drives motor to make a circle
     """
+    pass
 
   def do_information(self, arg):
     """
@@ -240,5 +253,10 @@ class ScALP(cmd.Cmd):
 
 
 if __name__ == '__main__':
-        c = ScALP()
-        sys.exit(c.cmdloop())
+  for i in range(0, 20):
+    bytes_i = bytes()
+    print(bytes_i)
+
+
+  # c = ScALP()
+  # sys.exit(c.cmdloop())
