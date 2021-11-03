@@ -14,7 +14,7 @@ import cv2
 import cmd
 from pyfiglet import Figlet
 
-raspberry_pi = False
+raspberry_pi = True
 
 if raspberry_pi:
   import spidev
@@ -250,7 +250,23 @@ class ScALP(cmd.Cmd):
     input_radius = float(input_radius)
     x = [round(input_radius * np.cos(angle)) + x for angle in angles]
     y = [round(input_radius * np.sin(angle)) + y for angle in angles]
-    pass
+    for count, point in enumerate(x, 0):
+      x_val = int(x[count]) + 4096
+      x_b_val = f'{x_val:016b}'
+      hex1 = hex(int(x_b_val[0:8], 2))
+      hex2 = hex(int(x_b_val[8:16], 2))
+      hex1 = int(hex1, 16)
+      hex2 = int(hex2, 16)
+      spi1.writebytes([hex1, hex2])
+      y_val = int(y[count]) + 65536
+      y_b_val = f'{y_val:016b}'
+      hex1 = hex(int(y_b_val[0:8], 2))
+      hex2 = hex(int(y_b_val[8:16], 2))
+      hex1 = int(hex1, 16)
+      hex2 = int(hex2, 16)
+      spi1.writebytes([hex1, hex2])
+      time.sleep(0.005)
+    
 
   def do_information(self, arg):
     """
@@ -298,31 +314,25 @@ def bitstring_to_bytes(s):
 
 
 def set_int_to_DAC():
-  for i in range(17, 4000, 1):
+  for i in range(100, 4000, 100):
     val = int(i) + 4096
     binary_val = f'{val:016b}'
-    # hex_val = binToHexa(binary_val)
     res = bitstring_to_bytes(binary_val)
     hex1 = hex(int(binary_val[0:8], 2))
-    print(hex1)
-    print(type(hex1))
     hex2 = hex(int(binary_val[8:16], 2))
-    print(type(int(hex2, 16)))
-    print(type(0x30))
     hex1 = int(hex1, 16)
     hex2 = int(hex2, 16)
     spi1.writebytes([hex1, hex2])
     spi2.writebytes([hex1, hex2])
     time.sleep(0.005)
-  for i in range(1000, 17, -1):
-    val = int(i) + 12288
+  for i in range(4000, 100, -100):
+    val = int(i) + 4096
     binary_val = f'{val:016b}'
-    # hex_val = binToHexa(binary_val)
     res = bitstring_to_bytes(binary_val)
     hex1 = hex(int(binary_val[0:8], 2))
-    print(hex1)
     hex2 = hex(int(binary_val[8:16], 2))
-    print(hex2)
+    hex1 = int(hex1, 16)
+    hex2 = int(hex2, 16)
     spi1.writebytes([hex1, hex2])
     spi2.writebytes([hex1, hex2])
     time.sleep(0.005)
