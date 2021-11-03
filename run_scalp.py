@@ -250,7 +250,6 @@ class ScALP(cmd.Cmd):
     input_radius = float(input_radius)
     x = [round(input_radius * np.cos(angle)) + x for angle in angles]
     y = [round(input_radius * np.sin(angle)) + y for angle in angles]
-
     pass
 
   def do_information(self, arg):
