@@ -208,18 +208,49 @@ class ScALP(cmd.Cmd):
 
 
   def do_drivexy(self, arg):
-    '''
+    """
     Drives the digital signal to send the laser to
     a specific point. Can be called <=800 times a second.
     Uses a list of x and y points.
-    '''
+    """
+    for i in range(100, 4000, 100):
+      val = int(i) + 4096
+      binary_val = f'{val:016b}'
+      hex1 = hex(int(binary_val[0:8], 2))
+      hex2 = hex(int(binary_val[8:16], 2))
+      hex1 = int(hex1, 16)
+      hex2 = int(hex2, 16)
+      spi1.writebytes([hex1, hex2])
+      spi2.writebytes([hex1, hex2])
+      time.sleep(0.005)
+    for i in range(4000, 100, -100):
+      val = int(i) + 4096
+      binary_val = f'{val:016b}'
+      hex1 = hex(int(binary_val[0:8], 2))
+      hex2 = hex(int(binary_val[8:16], 2))
+      hex1 = int(hex1, 16)
+      hex2 = int(hex2, 16)
+      spi1.writebytes([hex1, hex2])
+      spi2.writebytes([hex1, hex2])
+      time.sleep(0.005)
     
-    pass
 
   def do_circle(self, arg):
     """
     Drives motor to make a circle
     """
+    points = 100
+    angles = np.linspace(0, 2*3.14159, points)
+    input_x = input("Provide center x (int): ")
+    input_y = input("Provide center y (int): ")
+    x = float(input_x)
+    y = float(input_y)
+    input_radius = input("Provide radius (int less than 1000): ")
+    angles = [float(i) for i in list(angles)]
+    input_radius = float(input_radius)
+    x = [round(input_radius * np.cos(angle)) + x for angle in angles]
+    y = [round(input_radius * np.sin(angle)) + y for angle in angles]
+
     pass
 
   def do_information(self, arg):
@@ -268,7 +299,6 @@ def bitstring_to_bytes(s):
 
 
 def set_int_to_DAC():
-    
   for i in range(17, 4000, 1):
     val = int(i) + 4096
     binary_val = f'{val:016b}'
@@ -285,7 +315,6 @@ def set_int_to_DAC():
     spi1.writebytes([hex1, hex2])
     spi2.writebytes([hex1, hex2])
     time.sleep(0.005)
-  
   for i in range(1000, 17, -1):
     val = int(i) + 12288
     binary_val = f'{val:016b}'
@@ -295,7 +324,8 @@ def set_int_to_DAC():
     print(hex1)
     hex2 = hex(int(binary_val[8:16], 2))
     print(hex2)
-    #spi1.writebytes([hex1, hex2])
+    spi1.writebytes([hex1, hex2])
+    spi2.writebytes([hex1, hex2])
     time.sleep(0.005)
 
 
