@@ -4,6 +4,7 @@
 
 from operator import sub
 import os, sys, random
+import time
 from matplotlib import image
 import numpy as np
 from numpy.core.fromnumeric import size
@@ -17,8 +18,13 @@ raspberry_pi = False
 
 if raspberry_pi:
   import spidev
-  spi = spidev.SpiDev(0, 1)
-  spi.max_speed_hz = 250000
+  spi1 = spidev.SpiDev()
+  spi1.open(0,1)
+  spi1.max_speed_hz = 250000
+  spi1.bits_per_word = 8
+  spi1.mode = 0
+  spi2 = spidev.SpiDev(0, 1)
+  spi2.max_speed_hz = 250000
 
 
 class ScALP(cmd.Cmd):
@@ -252,11 +258,47 @@ class ScALP(cmd.Cmd):
         self.file = None
 
 
+def bitstring_to_bytes(s):
+  v = int(s, 2)
+  b = bytearray()
+  while v:
+    b.append(v & 0xFF)
+    v >>= 8
+    return bytes(b[::-1])
+
+
+def set_int_to_DAC():
+    
+  for i in range(17, 4000, 1):
+    val = int(i) + 4096
+    binary_val = f'{val:016b}'
+    # hex_val = binToHexa(binary_val)
+    res = bitstring_to_bytes(binary_val)
+    hex1 = hex(int(binary_val[0:8], 2))
+    print(hex1)
+    print(type(hex1))
+    hex2 = hex(int(binary_val[8:16], 2))
+    print(type(int(hex2, 16)))
+    print(type(0x30))
+    hex1 = int(hex1, 16)
+    hex2 = int(hex2, 16)
+    spi1.writebytes([hex1, hex2])
+    spi2.writebytes([hex1, hex2])
+    time.sleep(0.005)
+  
+  for i in range(1000, 17, -1):
+    val = int(i) + 12288
+    binary_val = f'{val:016b}'
+    # hex_val = binToHexa(binary_val)
+    res = bitstring_to_bytes(binary_val)
+    hex1 = hex(int(binary_val[0:8], 2))
+    print(hex1)
+    hex2 = hex(int(binary_val[8:16], 2))
+    print(hex2)
+    #spi1.writebytes([hex1, hex2])
+    time.sleep(0.005)
+
+
 if __name__ == '__main__':
-  for i in range(0, 20):
-    bytes_i = bytes()
-    print(bytes_i)
-
-
-  # c = ScALP()
-  # sys.exit(c.cmdloop())
+  c = ScALP()
+  sys.exit(c.cmdloop())
