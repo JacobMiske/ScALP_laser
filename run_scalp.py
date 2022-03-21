@@ -335,6 +335,7 @@ class ScALP(cmd.Cmd):
 
   def do_message(self, arg):
     scalp_ms = ms.Message()
+    scalp_ms.get_message()
 
   def do_bye(self, arg):
     """
