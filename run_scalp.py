@@ -15,6 +15,7 @@ import cmd
 from pyfiglet import Figlet
 from src import Background as bg
 from src import Frame as fr
+from src import Message as ms
 
 raspberry_pi = True
 
@@ -331,6 +332,9 @@ class ScALP(cmd.Cmd):
     """
     
     pass
+
+  def do_message(self, arg):
+    scalp_ms = ms.Message()
 
   def do_bye(self, arg):
     """
