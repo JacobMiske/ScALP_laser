@@ -1,11 +1,12 @@
 import cv2
+import numpy as np
 
 class Background:
 
     def __init__(self):
         self.count = 0
 
-    def set_background():
+    def set_background(self):
         """
         Generate background video
         """

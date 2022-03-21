@@ -6,7 +6,7 @@ class Frame:
     def __init__(self):
         self.count = 0
 
-    def set_frame():
+    def set_frame(self):
         """
         Based on background, take short video with subject and run subtraction
         """
