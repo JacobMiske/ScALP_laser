@@ -72,6 +72,7 @@ def get_frames_diff_from_video():
     frame_diff_directory = "./current_video_frame_diffs/"
     count = 0
     for f in os.listdir(frame_diff_directory):
+        print(f)
         image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
         img_grey =  cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         thresh = 10
