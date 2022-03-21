@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import cv2
 import cmd
 from pyfiglet import Figlet
+from src import Instruction as ins
 
 
 def main():
@@ -27,8 +28,13 @@ def main():
     else: 
         print("not empty")
     instruction_set = get_contour_instructions_per_frame()
-    set_instruction_for_video(instruct = instruction_set)
-    
+    print(instruction_set)
+    scalp_instruction = ins.Instruction(instruct=instruction_set)
+    scalp_instruction.get_instruction_sizes()
+    scalp_instruction.get_instruction_lengths()
+    scalp_instruction.plot_first_instruction()
+    # set_instruction_for_video(instruct = instruction_set)
+
 
 def get_frames_from_video():
     cap = cv2.VideoCapture("./media/ball.mp4")
