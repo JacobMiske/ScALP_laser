@@ -156,7 +156,7 @@ class ScALP(cmd.Cmd):
     """
     for i in range(100, 4000, 100):
       val = int(i) + 4096
-      binary_val = f'{val:016b}'
+      binary_val = f"{val:016b}"
       hex1 = hex(int(binary_val[0:8], 2))
       hex2 = hex(int(binary_val[8:16], 2))
       hex1 = int(hex1, 16)
