@@ -6,7 +6,7 @@ class Background:
     def __init__(self):
         self.count = 0
 
-    def set_background(self):
+    def set_background(self, arg):
         """
         Generate background video
         """
