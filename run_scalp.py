@@ -192,31 +192,132 @@ class ScALP(cmd.Cmd):
     input_radius = float(input_radius)
     x = [round(input_radius * np.cos(angle)) + x for angle in angles]
     y = [round(input_radius * np.sin(angle)) + y for angle in angles]
-    for count, point in enumerate(x, 0):
-      x_val = int(x[count]) + 4096
-      x_b_val = f'{x_val:016b}'
-      hex1 = hex(int(x_b_val[0:8], 2))
-      hex2 = hex(int(x_b_val[8:16], 2))
-      hex1 = int(hex1, 16)
-      hex2 = int(hex2, 16)
-      spi1.writebytes([hex1, hex2])
-      y_val = int(y[count]) + 65536
-      y_b_val = f'{y_val:016b}'
-      hex1 = hex(int(y_b_val[0:8], 2))
-      hex2 = hex(int(y_b_val[8:16], 2))
-      hex1 = int(hex1, 16)
-      hex2 = int(hex2, 16)
-      spi1.writebytes([hex1, hex2])
-      time.sleep(0.005)
-    
+    while True:
+      for count, point in enumerate(x, 0):
+        x_val = int(x[count]) + 4096
+        x_b_val = f'{x_val:016b}'
+        hex1 = hex(int(x_b_val[0:8], 2))
+        hex2 = hex(int(x_b_val[8:16], 2))
+        hex1 = int(hex1, 16)
+        hex2 = int(hex2, 16)
+        spi1.writebytes([hex1, hex2])
+        y_val = int(y[count]) + 36864
+        y_b_val = f'{y_val:016b}'
+        hex1 = hex(int(y_b_val[0:8], 2))
+        hex2 = hex(int(y_b_val[8:16], 2))
+        hex1 = int(hex1, 16)
+        hex2 = int(hex2, 16)
+        spi1.writebytes([hex1, hex2])
 
   def do_information(self, arg):
     """
     Get info on an image
     """
-    frame = cv2.imread('./background_frame.jpg')
-    print(frame[0,0])
+    frame = cv2.imread('./whitestar.jpg', cv2.IMREAD_GRAYSCALE)
+    scale_percent = 30 # percent of original size
+    width = int(frame.shape[1] * scale_percent / 100)
+    height = int(frame.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
+    contours = cv2.findContours(frame, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    print(type(contours[1]))
+    points = np.vstack(contours[1])
+    # print(points)
+    print(points[0])
+    print("Number of Contours found = " + str(len(contours)))
+    # cv2.drawContours(frame, contours[0], -1, (0, 255, 0), 3)
+    # cv2.imshow('Contours', contours[0])
+    # cv2.waitKey(0)
+    # x = [float(i[0][0])*2 for i in points]
+    # y = [float(i[0][1])*2 for i in points]
+    x = list(range(0,1000,100)) + [1000]*10 + list(range(1000,0,-100)) + [0]*10
+    y = [0]*10 + list(range(0,1000,100)) + [1000]*10 + list(range(1000,0,-100))
+    print(x)
+    print(y)
     cv2.destroyAllWindows()
+    while True:
+      for count, point in enumerate(x, 0):
+        x_val = int(x[count]) + 4096
+        x_b_val = f'{x_val:016b}'
+        hex1 = hex(int(x_b_val[0:8], 2))
+        hex2 = hex(int(x_b_val[8:16], 2))
+        hex1 = int(hex1, 16)
+        hex2 = int(hex2, 16)
+        spi1.writebytes([hex1, hex2])
+        y_val = int(y[count]) + 36864
+        y_b_val = f'{y_val:016b}'
+        hex1 = hex(int(y_b_val[0:8], 2))
+        hex2 = hex(int(y_b_val[8:16], 2))
+        hex1 = int(hex1, 16)
+        hex2 = int(hex2, 16)
+        spi1.writebytes([hex1, hex2])
+
+  def do_image(self, arg):
+    """
+    reads image, creates point list
+    """
+    img = cv2.imread("./whitestar.jpg", cv2.IMREAD_UNCHANGED)
+    img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    cv2.imshow("example", img_grey)
+    thresh = 100
+    ret, thresh_img = cv2.threshold(img_grey, thresh, 255, cv2.THRESH_BINARY)
+    contours = cv2.findContours(thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    img_contours = np.zeros(img.shape)
+    contour_points = contours[1]
+    #cv2.drawContours(img_contours, contours[1], -1, (0,255,0), 3)
+    #cv2.imwrite("./contours.png", img_contours)
+    # Now find equally spaced points along contours[1]
+    xs = []
+    ys = []
+    print(contour_points)
+    print(contour_points[0])
+    for i in contour_points[0]:
+      xs.append(i[0][0])
+      ys.append(i[0][1])
+    plt.figure(0)
+    plt.scatter(ys, xs)
+    plt.show()
+    plt.close()
+    # closed contour from xc to yc
+    xc = xs + [xs[0]]
+    yc = ys + [ys[0]]
+    # find spacing between points
+    dx = np.diff(xc)
+    dy = np.diff(yc)
+    dS = np.sqrt(dx*dx + dy*dy)
+    print(dS)
+    dS = [0] + list(dS)
+    d = np.cumsum(dS)
+    perimeter = d[-1]
+    N = 50
+    ds = perimeter/N
+    dSi = [ds*i for i in range(0, N)]
+    
+    xi = np.interp(dSi, d, xc)
+    yi = np.interp(dSi, d, yc)
+    plt.figure(1)
+    plt.scatter(yi, xi)
+    plt.show()
+    plt.close()
+    x = [i*3 for i in xi]
+    y = [j*3 for j in yi]
+    while True:
+      for count, point in enumerate(x, 0):
+        x_val = int(x[count]) + 4096
+        x_b_val = f'{x_val:016b}'
+        hex1 = hex(int(x_b_val[0:8], 2))
+        hex2 = hex(int(x_b_val[8:16], 2))
+        hex1 = int(hex1, 16)
+        hex2 = int(hex2, 16)
+        spi1.writebytes([hex1, hex2])
+        y_val = int(y[count]) + 36864
+        y_b_val = f'{y_val:016b}'
+        hex1 = hex(int(y_b_val[0:8], 2))
+        hex2 = hex(int(y_b_val[8:16], 2))
+        hex1 = int(hex1, 16)
+        hex2 = int(hex2, 16)
+        spi1.writebytes([hex1, hex2])
+    pass
 
   def do_colorpick(self, arg):
     """
