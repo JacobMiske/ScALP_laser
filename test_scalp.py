@@ -15,25 +15,31 @@ import cv2
 import cmd
 from pyfiglet import Figlet
 from src import Instruction as ins
+from src import Frame as fr
 
 
 def main():
     print("ALP test")
-    
-
-    file_dir = "./current_video_frame_threshs/"
-    if [f for f in os.listdir(file_dir) if not f.startswith('.')] == []:
-        print("empty dir")
-        get_frames_diff_from_video()
-    else: 
-        print("not empty")
-    instruction_set = get_contour_instructions_per_frame()
-    print(instruction_set)
-    scalp_instruction = ins.Instruction(instruct=instruction_set)
-    scalp_instruction.get_instruction_sizes()
-    scalp_instruction.get_instruction_lengths()
-    scalp_instruction.plot_first_instruction()
-    # set_instruction_for_video(instruct = instruction_set)
+    # This segment of code tests generating an Instruction with a single frame
+    scalp_frame = fr.Frame()
+    single_contour = scalp_frame.get_contour_of_image(image_path="./whitestar.jpg")
+    scalp_instruction = scalp_frame.get_instruction_from_contour(contour=single_contour)
+    print(scalp_instruction)
+    # This segment of code tests an Instruction with multiple frames
+    # file_dir = "./current_video_frame_threshs/"
+    # if [f for f in os.listdir(file_dir) if not f.startswith('.')] == []:
+    #     print("empty dir")
+    #     get_frames_diff_from_video()
+    # else: 
+    #     print("not empty")
+    # instruction_set = get_contour_instructions_per_frame()
+    # print(instruction_set)
+    # scalp_instruction_set = ins.Instruction(instruct=instruction_set)
+    # scalp_instruction_set.get_instruction_sizes()
+    # scalp_instruction_set.get_instruction_lengths()
+    # scalp_instruction_set.plot_first_instruction()
+    # scalp_instruction_set.plot_all_instructions()
+    # # set_instruction_for_video(instruct = instruction_set)
 
 
 def get_frames_from_video():
@@ -71,7 +77,7 @@ def get_frames_diff_from_video():
     cv2.destroyAllWindows() # destroy all opened windows
     frame_diff_directory = "./current_video_frame_diffs/"
     count = 0
-    for f in os.listdir(frame_diff_directory):
+    for f in sorted(os.listdir(frame_diff_directory)):
         print(f)
         image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
         img_grey =  cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
@@ -96,6 +102,7 @@ def get_contour_instructions_per_frame():
         x_vals, y_vals = get_scatter_points_equal_spacing_plot(contour_points=cpts[0][0], count=ct)
         instruction_set.append([x_vals, y_vals])
         ct += 1
+        # TODO: change when 10 good instruction sets made
         if ct == 10:
             return instruction_set
     return instruction_set
