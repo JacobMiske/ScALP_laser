@@ -24,22 +24,23 @@ def main():
     scalp_frame = fr.Frame()
     single_contour = scalp_frame.get_contour_of_image(image_path="./whitestar.jpg")
     scalp_instruction = scalp_frame.get_instruction_from_contour(contour=single_contour)
-    print(scalp_instruction)
+    scalp_instruction.plot_instruction()
+    scalp_instruction.get_instruction_size()
     # This segment of code tests an Instruction with multiple frames
-    # file_dir = "./current_video_frame_threshs/"
-    # if [f for f in os.listdir(file_dir) if not f.startswith('.')] == []:
-    #     print("empty dir")
-    #     get_frames_diff_from_video()
-    # else: 
-    #     print("not empty")
-    # instruction_set = get_contour_instructions_per_frame()
-    # print(instruction_set)
-    # scalp_instruction_set = ins.Instruction(instruct=instruction_set)
-    # scalp_instruction_set.get_instruction_sizes()
-    # scalp_instruction_set.get_instruction_lengths()
-    # scalp_instruction_set.plot_first_instruction()
-    # scalp_instruction_set.plot_all_instructions()
-    # # set_instruction_for_video(instruct = instruction_set)
+    file_dir = "./current_video_frame_threshs/"
+    if [f for f in os.listdir(file_dir) if not f.startswith('.')] == []:
+        print("empty dir")
+        get_frames_diff_from_video()
+    else: 
+        print("not empty")
+    instruction_set = get_contour_instructions_per_frame()
+    print(instruction_set)
+    scalp_instruction_set = ins.Instruction()
+    scalp_instruction_set.instruction_series = instruction_set
+    scalp_instruction_set.get_instruction_size()
+    scalp_instruction_set.get_instruction_lengths()
+    scalp_instruction_set.plot_all_instructions()
+    # set_instruction_for_video(instruct = instruction_set)
 
 
 def get_frames_from_video():
@@ -155,7 +156,6 @@ def get_scatter_points_equal_spacing_plot(contour_points, count):
     N = 50
     ds = perimeter / N
     dSi = [ds*i for i in range(0, N)]
-
     xi = []
     yi = []
     dSi[-1] = dSi[-1] - 0.005
@@ -192,13 +192,14 @@ def plot_longest_contours_in_frame(c_points):
         else:
             index += 1
     # show longest contour
-    plt.figure(3)
+    plt.figure()
     xs = []
     ys = []
     for i in c_points[0][index]:
         xs.append(i[0][0])
         ys.append(i[0][1])
     plt.scatter(xs, ys)
+    plt.close()
     return 0
 
 if __name__ == '__main__':
