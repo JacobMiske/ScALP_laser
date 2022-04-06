@@ -16,6 +16,7 @@ import cmd
 from pyfiglet import Figlet
 from src import Instruction as ins
 from src import Frame as fr
+from src import Display as disp
 
 
 def main():
@@ -25,7 +26,6 @@ def main():
     single_contour = scalp_frame.get_contour_of_image(image_path="./whitestar.jpg")
     scalp_instruction = scalp_frame.get_instruction_from_contour(contour=single_contour)
     scalp_instruction.plot_instruction()
-    scalp_instruction.get_instruction_size()
     # This segment of code tests an Instruction with multiple frames
     file_dir = "./current_video_frame_threshs/"
     if [f for f in os.listdir(file_dir) if not f.startswith('.')] == []:
@@ -33,13 +33,16 @@ def main():
         get_frames_diff_from_video()
     else: 
         print("not empty")
-    instruction_set = get_contour_instructions_per_frame()
-    print(instruction_set)
+    # instruction_set = get_contour_instructions_per_frame()
     scalp_instruction_set = ins.Instruction()
-    scalp_instruction_set.instruction_series = instruction_set
-    scalp_instruction_set.get_instruction_size()
-    scalp_instruction_set.get_instruction_lengths()
-    scalp_instruction_set.plot_all_instructions()
+    scalp_instruction_set.get_instruction_series_from_video_frames(directory=file_dir)
+    print(scalp_instruction_set.instruction_series[1])
+    # scalp_instruction_set.instruction_series = instruction_set
+    # scalp_instruction_set.get_instruction_size()
+    # scalp_instruction_set.plot_instruction_series()
+    A = scalp_instruction_set.instruction_series
+    scalp_display = disp.Display()
+    scalp_display.display_series_of_instructions(instruct_series=A)
     # set_instruction_for_video(instruct = instruction_set)
 
 
@@ -78,7 +81,10 @@ def get_frames_diff_from_video():
     cv2.destroyAllWindows() # destroy all opened windows
     frame_diff_directory = "./current_video_frame_diffs/"
     count = 0
-    for f in sorted(os.listdir(frame_diff_directory)):
+    files = os.listdir(frame_diff_directory)
+    files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
+    img_files = list(filter(lambda x: '.jpg' in x, files))
+    for f in img_files:
         print(f)
         image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
         img_grey =  cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
@@ -95,7 +101,7 @@ def get_contour_instructions_per_frame():
     ct = 0
     file_dir = "./current_video_frame_threshs/"
     instruction_set = []
-    files = os.listdir(file_dir)
+    files = sorted(os.listdir(file_dir))
     img_files = list(filter(lambda x: '.jpg' in x, files))
     for img in img_files:
         cpts = get_contour_points(image_path=img)
@@ -119,7 +125,6 @@ def get_contour_points(image_path):
     contours = cv2.findContours(thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours = contours
     img_contours = np.zeros(img_grey.shape)
-    cv2.imwrite('./contours.png',img_contours)
     return contours
 
 

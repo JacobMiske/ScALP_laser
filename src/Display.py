@@ -19,7 +19,7 @@ class Display:
     def __init__(self) -> None:
         pass
 
-    def display_instruction(self, instruct, display_time):
+    def display_single_instruction(self, instruct, display_time):
         # Given single instruction, display for $display_time seconds
         if raspberry_pi:
             x = list(instruct[:, 0])
@@ -41,6 +41,33 @@ class Display:
                     hex1 = int(hex1, 16)
                     hex2 = int(hex2, 16)
                     spi1.writebytes([hex1, hex2])
+        else:
+            print("System is not setup to run Display functions")
+            return -1
+
+    def display_series_of_instructions(self, instruct_series, display_time):
+        if raspberry_pi:
+            for instruct in instruct_series:
+                x = list(instruct[0][:, 0])
+                y = list(instruct[0][:, 1])
+                t_end = time.time() + display_time
+                while time.time() < t_end:
+                    for count, point in enumerate(x, 0):
+                        x_val = int(x[count]) + 4096
+                        x_b_val = f'{x_val:016b}'
+                        hex1 = hex(int(x_b_val[0:8], 2))
+                        hex2 = hex(int(x_b_val[8:16], 2))
+                        hex1 = int(hex1, 16)
+                        hex2 = int(hex2, 16)
+                        spi1.writebytes([hex1, hex2])
+                        y_val = int(y[count]) + 36864
+                        y_b_val = f'{y_val:016b}'
+                        hex1 = hex(int(y_b_val[0:8], 2))
+                        hex2 = hex(int(y_b_val[8:16], 2))
+                        hex1 = int(hex1, 16)
+                        hex2 = int(hex2, 16)
+                        spi1.writebytes([hex1, hex2])
+            return 0
         else:
             print("System is not setup to run Display functions")
             return -1

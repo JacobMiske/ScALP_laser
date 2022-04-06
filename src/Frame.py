@@ -37,7 +37,6 @@ class Frame:
             y_val = point[0][1]
             new_instruction_list.append([x_val, y_val])
         new_instruction_list = self.convert_instruction_to_equal_spacing(contour_points=new_instruction_list)
-        # print(new_instruction_list)
         new_ins = ins.Instruction()
         new_ins.instruct = np.asarray(a=new_instruction_list)
         return new_ins
@@ -90,14 +89,12 @@ class Frame:
         dx = np.diff(xc)
         dy = np.diff(yc)
         dS = np.sqrt(dx*dx + dy*dy)
-        # print(dS)
         dS = [0] + list(dS)
         d = np.cumsum(dS)
         perimeter = d[-1]
         N = 50
         ds = perimeter / N
         dSi = [ds*i for i in range(0, N)]
-
         xi = []
         yi = []
         dSi[-1] = dSi[-1] - 0.005
