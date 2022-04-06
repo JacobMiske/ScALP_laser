@@ -51,7 +51,8 @@ class Instruction:
                     len_longest_contour = len(contour[0])
                 contour_count += 1
             l_contour = contours[longest_contour]
-            self.instruction_series.append(l_contour[0][:, :2])
+            l_contour = l_contour[0]
+            self.instruction_series.append(l_contour[:, :2])
         return 0
 
 

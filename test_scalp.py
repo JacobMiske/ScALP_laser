@@ -8,7 +8,6 @@ import time
 from matplotlib import image
 import numpy as np
 from numpy.core.fromnumeric import size
-from pip import main
 import scipy.ndimage as ndimage
 import matplotlib.pyplot as plt
 import cv2
@@ -42,7 +41,7 @@ def main():
     # scalp_instruction_set.plot_instruction_series()
     A = scalp_instruction_set.instruction_series
     scalp_display = disp.Display()
-    scalp_display.display_series_of_instructions(instruct_series=A)
+    scalp_display.display_series_of_instructions(instruct_series=A, display_time=1)
     # set_instruction_for_video(instruct = instruction_set)
 
 
