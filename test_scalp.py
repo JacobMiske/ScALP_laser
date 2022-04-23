@@ -23,6 +23,7 @@ def main():
     # This segment of code tests generating an Instruction with a single frame
     scalp_frame = fr.Frame()
     single_contour = scalp_frame.get_contour_of_image(image_path="./whitestar.jpg")
+    scalp_instruction = ins.Instruction()
     scalp_instruction = scalp_frame.get_instruction_from_contour(contour=single_contour)
     scalp_instruction.plot_instruction()
     # This segment of code tests an Instruction with multiple frames

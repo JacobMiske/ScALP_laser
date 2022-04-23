@@ -24,7 +24,14 @@ class Instruction:
         print(len(self.instruct))
         print("Number of instructions in instruction series: ")
         print(len(self.instruction_series))
-    
+
+
+    def append(self, point):
+        # given a point, adds to end of self.instruct
+        # point should be list with int X and Y -> [X, Y]
+        self.instruct.append(point)
+        return 0
+
 
     def get_instruction_series_from_video_frames(self, directory):
         instruction_set = []
