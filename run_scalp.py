@@ -361,6 +361,7 @@ def bitstring_to_bytes(s):
 
 
 def set_int_to_DAC():
+  # draws a circle?
   for i in range(100, 4000, 100):
     val = int(i) + 4096
     binary_val = f'{val:016b}'

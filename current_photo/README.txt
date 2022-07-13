@@ -1,0 +1,1 @@
+This folder holds one bitmap file, such as a photo for reference
