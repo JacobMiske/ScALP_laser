@@ -19,14 +19,32 @@ from src import Display as disp
 
 
 def main():
-    print("ALP test")
+    print("ScALP test \n ---------")
+    # create display object
+    test_display = disp.Display()
+
+    
+    # This segment of code drives the laser to the bounds of the laser limits, draws a cross through the center, and varies the color of the laser
+    print("Testing laser limits and color")
+    scalp_limit_and_color_instruction = ins.Instruction()
+    display_time = 5 # five seconds
+    bounding_box_and_cross_instruction = [[0, 0], [1000, 0], [1000, 1000], [0, 1000], [500, 500], 
+        [1000, 0], [1000, 1000], [500, 500], [0, 1000]]
+    
+    scalp_limit_and_color_instruction.instruct = bounding_box_and_cross_instruction
+    
+
     # This segment of code tests generating an Instruction with a single frame
+    print("Testing static instruction")
     scalp_frame = fr.Frame()
     single_contour = scalp_frame.get_contour_of_image(image_path="./whitestar.jpg")
     scalp_instruction = ins.Instruction()
     scalp_instruction = scalp_frame.get_instruction_from_contour(contour=single_contour)
     scalp_instruction.plot_instruction()
+
+
     # This segment of code tests an Instruction with multiple frames
+    print("Testing dynamic instruction")
     file_dir = "./current_video_frame_threshs/"
     if [f for f in os.listdir(file_dir) if not f.startswith('.')] == []:
         print("empty dir")

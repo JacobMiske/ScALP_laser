@@ -16,6 +16,7 @@ from pyfiglet import Figlet
 from src import Background as bg
 from src import Frame as fr
 from src import Message as ms
+from src import Display as disp
 
 raspberry_pi = True
 
@@ -37,6 +38,8 @@ class ScALP(cmd.Cmd):
   file = None
   print(custom_fig.renderText(' ScALP '))
   
+  def __init__(self):
+    ScALP_display = disp.Display()
 
   def do_background(self, arg):
     scalp_bg = bg.Background()

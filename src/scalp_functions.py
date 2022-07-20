@@ -1,3 +1,4 @@
+# Legacy code
 import time
 
 def bitstring_to_bytes(s):
