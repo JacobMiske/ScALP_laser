@@ -3,7 +3,7 @@
 
 import cv2
 import numpy as np
-from data_structures.alphabet_dict import ALPHABET_DATA_FILE 
+# from data_structures.alphabet_dict import ALPHABET_DATA_FILE 
 
 class Message:
 
@@ -13,3 +13,7 @@ class Message:
     def get_message(self):
         user_message = input("Please provide a short string of characters: ")
         print(user_message)
+
+    def get_instructions_for_text(self, text, size):
+        # input text and relative size, get back list of instructions to pass into instruction object
+        pass 

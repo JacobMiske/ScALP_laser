@@ -18,7 +18,7 @@ from src import Frame as fr
 from src import Message as ms
 from src import Display as disp
 
-raspberry_pi = True
+raspberry_pi = False
 
 if raspberry_pi:
   import spidev
@@ -37,18 +37,12 @@ class ScALP(cmd.Cmd):
   prompt = '> '
   file = None
   print(custom_fig.renderText(' ScALP '))
-  
+
+
   def __init__(self):
-    ScALP_display = disp.Display()
-
-  def do_background(self, arg):
-    scalp_bg = bg.Background()
-    scalp_bg.set_background()
-	
-
-  def do_frame(self, arg):
-    scalp_fr = fr.Frame()
-    scalp_fr.set_frame()
+    # Call on constructor of the parent class cmd.Cmd
+    super(ScALP, self).__init__()
+    self.ScALP_display = disp.Display()
 
 
   def do_xy(self, arg):
@@ -391,4 +385,5 @@ def set_int_to_DAC():
 
 if __name__ == '__main__':
   c = ScALP()
-  sys.exit(c.cmdloop())
+  c.cmdloop()
+  sys.exit()

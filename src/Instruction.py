@@ -9,32 +9,49 @@ class Instruction:
 
     def __init__(self):
         self.name = ""
-        # Singular instruction
-        self.instruct = []
-        # Multiple instruction
+        # Instruction_series can either be:
+        # Singular instruction, list of points in [x, y] 
+        # format [[x1, y1], [x2, y2],...] OR
+        # Multiple instruction, list of lists of points in [x, y]
+        # format [[[x11, y11], [x12, y12],...], [[x21, y21], [x22, y22],...]]
         self.instruction_series = []
+        # Color instruction series can either be:
+        # Singular instruction, must be same length as self.instruction_series 
+        # [color1, color2,...]
+        # Multiple instruction, list of lists of colors
+        # format [[[color11], [color12],...], [[color21], [color22],...],...]
+        self.color_instruction_series = []
+
+
+    def set_instruction_series(self, given_series):
+        # directly sets the instruction series of the Instruction object
+        self.instruction_series = given_series
+
+
+    def set_color_instruction_series(self, given_color_series):
+        # directly sets the color instruction series of the Instruction object
+        self.color_instruction_series = given_color_series
 
 
     def __str__(self):
-        return str(self.instruct)
+        return str(self.instruction_series)
 
 
     def get_instruction_size(self):
-        print("Number of points in single instruction: ")
-        print(len(self.instruct))
         print("Number of instructions in instruction series: ")
         print(len(self.instruction_series))
+        print("Number of points in first instruction")
+        print(len(self.instruction_series[0]))
 
 
     def append(self, point):
-        # given a point, adds to end of self.instruct
+        # given a point, adds to end of self.instruction_series
         # point should be list with int X and Y -> [X, Y]
-        self.instruct.append(point)
+        self.instruction_series.append(point)
         return 0
 
 
     def get_instruction_series_from_video_frames(self, directory):
-        instruction_set = []
         # grab all files in directory
         files = os.listdir(directory)
         # sort by number on end of filename
@@ -64,8 +81,9 @@ class Instruction:
 
 
     def plot_instruction(self):
+        # For the first set of points in the instruction series, 
         plt.figure(1)
-        plt.scatter(self.instruct[:, 0], self.instruct[:, 1])
+        plt.scatter(self.instruction_series[:, 0], self.instruction_series[:, 1])
         plt.xlim([0, 1200])
         plt.ylim([0, 1200])
         plt.savefig("./instruction_plots/instruction.png")
@@ -73,6 +91,7 @@ class Instruction:
     
 
     def plot_instruction_series(self):
+        # For each individual set of points in the instruction series, plot and save
         for count, instruct in enumerate(self.instruction_series, 0):
             plt.figure(count)
             plt.figure(100)

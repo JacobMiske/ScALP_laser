@@ -14,10 +14,13 @@ if raspberry_pi:
     spi2 = spidev.SpiDev(0, 1)
     spi2.max_speed_hz = 250000
 
+
 class Display:
+
 
     def __init__(self) -> None:
         pass
+
 
     def display_single_instruction(self, instruct, display_time):
         # Given single instruction, display for $display_time seconds
@@ -44,6 +47,7 @@ class Display:
         else:
             print("System is not setup to run Display functions")
             return -1
+
 
     def display_series_of_instructions(self, instruct_series, display_time):
         if raspberry_pi:
