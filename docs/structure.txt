@@ -1,1 +1,2 @@
-The structure of the laser projector is kept in a small silver box.
+The structure of the laser projector is kept in a silver case with handle. There is an 80/20 Al extrusion box internally with the galvos and
+laser mounted to it. The galvo driver circuits are beside the extrusion box. The Raspberry Pi and DAC chips are on the other side of the case. 
