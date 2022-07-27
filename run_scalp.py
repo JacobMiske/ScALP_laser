@@ -8,7 +8,6 @@ import time
 from matplotlib import image
 import numpy as np
 from numpy.core.fromnumeric import size
-import scipy.ndimage as ndimage
 import matplotlib.pyplot as plt
 import cv2
 import cmd
@@ -17,7 +16,9 @@ from src import Background as bg
 from src import Frame as fr
 from src import Message as ms
 from src import Display as disp
+from src import Instruction as ins
 
+# Change on RPi before running
 raspberry_pi = False
 
 if raspberry_pi:
@@ -29,6 +30,9 @@ if raspberry_pi:
   spi1.mode = 0
   spi2 = spidev.SpiDev(0, 1)
   spi2.max_speed_hz = 250000
+else:
+  print("WARNING")
+  print("System is not setup to laser system")
 
 
 class ScALP(cmd.Cmd):
@@ -43,107 +47,52 @@ class ScALP(cmd.Cmd):
     # Call on constructor of the parent class cmd.Cmd
     super(ScALP, self).__init__()
     self.ScALP_display = disp.Display()
+    self.ScALP_instruction = ins.Instruction()
 
 
   def do_xy(self, arg):
     """
-    For each frame in background and foreground, subtract, Canny edge detection, find contours, get x-y
+    Input instruction series object directly as an input i.e. [[0,0], [1,0], [1,1], [0,1]]
+    Results in brief display of that instruction series
     """
-    back = cv2.VideoCapture('./background_video.avi')
-    fore = cv2.VideoCapture('./foreground_video.avi')
-    back_frames = []
-    fore_frames = []
-    diff_frames = []
-    for i in range(60):
-      _, back_frame = back.read()
-      _, fore_frame = fore.read()
-      back_gray = cv2.cvtColor(back_frame, cv2.COLOR_BGR2GRAY)
-      fore_gray = cv2.cvtColor(fore_frame, cv2.COLOR_BGR2GRAY)
-      back_frames.append(back_gray)
-      fore_frames.append(fore_gray)
-    threshold = 40
-    for i in range(0, 5):
-      print("frame: " + str(i))
-      f_frame = fore_frames[i]
-      b_frame = back_frames[i]
-      diff_frame = np.zeros(shape=(720, 1280))
-      for x in range(0, 720):
-        for y in range(0, 1280):
-          pixel = int(f_frame[x, y]) - int(b_frame[x,y])
-          if abs(pixel) > threshold:
-            diff_frame[x, y] = 1
-      diff_frames.append(diff_frame)
-    avg_img = np.mean(diff_frames, axis=0)
-    labeled_image, nb_labels = ndimage.label(diff_frames[-1], structure=np.ones((3,3)))
-    sizes = ndimage.sum(diff_frames[-1], labeled_image, range(nb_labels + 1))
-    sizes = list(sizes)
-    main_label = max(sizes)
-    res_list = [i for i, value in enumerate(sizes) if value == main_label]
-    main_label = res_list[0]
-    for x in range(0, 720):
-      for y in range(0, 1280):
-        if labeled_image[x, y] != main_label:
-          labeled_image[x, y] = 0
-        else:
-          labeled_image[x, y] = 255
-    cv2.imwrite('./labels.jpg', labeled_image)
-    image_bw = ndimage.binary_fill_holes(labeled_image).astype(int)
-    cv2.imwrite('./label_bw_filled_in.jpg', image_bw)
-
-    # while True:
-    #   cv2.imshow('Gray image', diff_frames[-1])
-    #   k = cv2.waitKey(33)
-    #   if k==27:    # Esc key to stop
-    #       break
-    cv2.destroyAllWindows()
+    arg = []
+    N = input("Number of points in instruction: ")
+    for point in range(0, int(N)):
+      print("Point {}".format(point))
+      x = input("X coordinate: ")
+      y = input("Y coordinate: ")
+      arg.append([int(x), int(y)])
+    xy_instruction = ins.Instruction()
+    xy_instruction.instruct = arg
+    if raspberry_pi:
+          self.ScALP_display.display_single_instruction(instruct=xy_instruction.instruct, display_time=5)
+    else:
+      print("Not connected to display, plotting")
+      self.ScALP_display.plot_single_instruction(instruct=xy_instruction.instruct)
 
 
   def do_xyRGB(self, arg):
     """
-    Similar to do_xy but looks at whole RGB
+    Similar to do_xy but includes second argument list of color settings
     """
-    back = cv2.VideoCapture('./background_video.avi')
-    fore = cv2.VideoCapture('./foreground_video.avi')
-    back_frames = []
-    fore_frames = []
-    diff_frames = []
-    for i in range(60):
-      _, back_frame = back.read()
-      _, fore_frame = fore.read()
-      back_frames.append(back_frame)
-      fore_frames.append(fore_frame)
-    threshold = 110
-    for i in range(0, 5):
-      print("frame: " + str(i))
-      f_frame = fore_frames[i]
-      b_frame = back_frames[i]
-      diff_frame = np.zeros(shape=(720, 1280))
-      for x in range(0, 720):
-        for y in range(0, 1280):
-          red_pixel = abs(int(f_frame[x, y][0]) - int(b_frame[x,y][0]))
-          green_pixel = abs(int(f_frame[x, y][1]) - int(b_frame[x,y][1]))
-          blue_pixel = abs(int(f_frame[x, y][2]) - int(b_frame[x,y][2]))
-          pixel_diff = red_pixel + green_pixel + blue_pixel
-          if abs(pixel_diff) > threshold:
-            diff_frame[x, y] = 255
-      diff_frames.append(diff_frame)
-    cv2.imwrite('./diff_frame.jpg', diff_frames[0])
-    labeled_image, nb_labels = ndimage.label(diff_frames[-1], structure=np.ones((3,3)))
-    sizes = ndimage.sum(diff_frames[-1], labeled_image, range(nb_labels + 1))
-    sizes = list(sizes)
-    main_label = max(sizes)
-    res_list = [i for i, value in enumerate(sizes) if value == main_label]
-    main_label = res_list[0]
-    for x in range(0, 720):
-      for y in range(0, 1280):
-        if labeled_image[x, y] != main_label:
-          labeled_image[x, y] = 0
-        else:
-          labeled_image[x, y] = 255
-    cv2.imwrite('./labels_RGB.jpg', labeled_image)
-    image_bw = ndimage.binary_fill_holes(labeled_image).astype(int)
-    cv2.imwrite('./label_bw_filled_in_RGB.jpg', image_bw)
-    cv2.destroyAllWindows()
+    arg = []
+    color_list = []
+    N = input("Number of points in instruction: ")
+    for point in range(0, int(N)):
+      print("Point {}".format(point))
+      x = input("X coordinate: ")
+      y = input("Y coordinate: ")
+      # TODO: figure out the color input schema
+      color = input("Color: (if no change, hit enter)")
+      arg.append([int(x), int(y)])
+      color_list.append(int(color))
+    xy_instruction = ins.Instruction()
+    xy_instruction.instruct = arg
+    if raspberry_pi:
+          self.ScALP_display.display_single_instruction(instruct=xy_instruction.instruct, display_time=5)
+    else:
+      print("Not connected to display, plotting")
+      self.ScALP_display.plot_single_instruction(instruct=xy_instruction.instruct)
 
 
   def do_drivexy(self, arg):

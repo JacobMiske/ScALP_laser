@@ -1,6 +1,8 @@
 # The Display class is handed Instructions and sends necessary 
 # commands to the laser controller over a SPI bus
 import time
+import numpy as np
+import matplotlib.pyplot as plt
 
 raspberry_pi = False
 
@@ -18,13 +20,15 @@ if raspberry_pi:
 class Display:
 
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self):
+        # Default display color is bright red
+        self.color = [256, 0, 0]
 
 
-    def display_single_instruction(self, instruct, display_time):
+    def display_single_instruction(self, instruct, display_time, color_list=None):
         # Given single instruction, display for $display_time seconds
         if raspberry_pi:
+            # If color_list = None, use default color for all points
             x = list(instruct[:, 0])
             y = list(instruct[:, 1])
             t_end = time.time() + display_time
@@ -75,3 +79,19 @@ class Display:
         else:
             print("System is not setup to run Display functions")
             return -1
+
+
+    def plot_single_instruction(self, instruct):
+        # use array for easy indexing
+        instruct = np.array(instruct)
+        # X values as first column, Y values as second column
+        x = list(instruct[:, 0])
+        y = list(instruct[:, 1])
+        plt.figure()
+        plt.scatter(x, y)
+        plt.show()
+        plt.close()
+
+
+    def plot_series_of_instructions(self, instruct_series):
+        pass

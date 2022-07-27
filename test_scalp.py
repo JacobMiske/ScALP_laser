@@ -2,6 +2,7 @@
 # GPL License
 #!/usr/bin/python3
 
+from dis import dis
 from operator import sub
 import os, sys, random
 import time
@@ -32,7 +33,7 @@ def main():
         [1000, 0], [1000, 1000], [500, 500], [0, 1000]]
     
     scalp_limit_and_color_instruction.instruct = bounding_box_and_cross_instruction
-    
+    test_display.display_single_instruction(instruct=scalp_limit_and_color_instruction.instruct, display_time=5)
 
     # This segment of code tests generating an Instruction with a single frame
     print("Testing static instruction")
