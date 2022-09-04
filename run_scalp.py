@@ -32,7 +32,7 @@ if raspberry_pi:
   spi2.max_speed_hz = 250000
 else:
   print("WARNING")
-  print("System is not setup to laser system")
+  print("System is not setup to laser system, software will plot instead of drive laser")
 
 
 class ScALP(cmd.Cmd):
@@ -55,17 +55,18 @@ class ScALP(cmd.Cmd):
     Input instruction series object directly as an input i.e. [[0,0], [1,0], [1,1], [0,1]]
     Results in brief display of that instruction series
     """
-    arg = []
+    points = []
     N = input("Number of points in instruction: ")
     for point in range(0, int(N)):
       print("Point {}".format(point))
       x = input("X coordinate: ")
       y = input("Y coordinate: ")
-      arg.append([int(x), int(y)])
+      points.append([int(x), int(y)])
     xy_instruction = ins.Instruction()
-    xy_instruction.instruct = arg
+    xy_instruction.instruct = points
     if raspberry_pi:
-          self.ScALP_display.display_single_instruction(instruct=xy_instruction.instruct, display_time=5)
+      # display for 5 seconds
+      self.ScALP_display.display_single_instruction(instruct=xy_instruction.instruct, display_time=5)
     else:
       print("Not connected to display, plotting")
       self.ScALP_display.plot_single_instruction(instruct=xy_instruction.instruct)
@@ -75,7 +76,7 @@ class ScALP(cmd.Cmd):
     """
     Similar to do_xy but includes second argument list of color settings
     """
-    arg = []
+    points = []
     color_list = []
     N = input("Number of points in instruction: ")
     for point in range(0, int(N)):
@@ -84,48 +85,20 @@ class ScALP(cmd.Cmd):
       y = input("Y coordinate: ")
       # TODO: figure out the color input schema
       color = input("Color: (if no change, hit enter)")
-      arg.append([int(x), int(y)])
+      points.append([int(x), int(y)])
       color_list.append(int(color))
     xy_instruction = ins.Instruction()
-    xy_instruction.instruct = arg
+    xy_instruction.instruct = points
     if raspberry_pi:
           self.ScALP_display.display_single_instruction(instruct=xy_instruction.instruct, display_time=5)
     else:
       print("Not connected to display, plotting")
       self.ScALP_display.plot_single_instruction(instruct=xy_instruction.instruct)
-
-
-  def do_drivexy(self, arg):
-    """
-    Drives the digital signal to send the laser to
-    a specific point. Can be called <=800 times a second.
-    Uses a list of x and y points.
-    """
-    for i in range(100, 4000, 100):
-      val = int(i) + 4096
-      binary_val = f"{val:016b}"
-      hex1 = hex(int(binary_val[0:8], 2))
-      hex2 = hex(int(binary_val[8:16], 2))
-      hex1 = int(hex1, 16)
-      hex2 = int(hex2, 16)
-      spi1.writebytes([hex1, hex2])
-      spi2.writebytes([hex1, hex2])
-      time.sleep(0.005)
-    for i in range(4000, 100, -100):
-      val = int(i) + 4096
-      binary_val = f'{val:016b}'
-      hex1 = hex(int(binary_val[0:8], 2))
-      hex2 = hex(int(binary_val[8:16], 2))
-      hex1 = int(hex1, 16)
-      hex2 = int(hex2, 16)
-      spi1.writebytes([hex1, hex2])
-      spi2.writebytes([hex1, hex2])
-      time.sleep(0.005)
     
 
   def do_circle(self, arg):
     """
-    Drives motor to make a circle
+    Drives system to make a circle
     """
     points = 100
     angles = np.linspace(0, 2*3.14159, points)
@@ -138,26 +111,35 @@ class ScALP(cmd.Cmd):
     input_radius = float(input_radius)
     x = [round(input_radius * np.cos(angle)) + x for angle in angles]
     y = [round(input_radius * np.sin(angle)) + y for angle in angles]
-    while True:
-      for count, point in enumerate(x, 0):
-        x_val = int(x[count]) + 4096
-        x_b_val = f'{x_val:016b}'
-        hex1 = hex(int(x_b_val[0:8], 2))
-        hex2 = hex(int(x_b_val[8:16], 2))
-        hex1 = int(hex1, 16)
-        hex2 = int(hex2, 16)
-        spi1.writebytes([hex1, hex2])
-        y_val = int(y[count]) + 36864
-        y_b_val = f'{y_val:016b}'
-        hex1 = hex(int(y_b_val[0:8], 2))
-        hex2 = hex(int(y_b_val[8:16], 2))
-        hex1 = int(hex1, 16)
-        hex2 = int(hex2, 16)
-        spi1.writebytes([hex1, hex2])
+
+    circle_instruction = ins.Instruction()
+    circle_instruction.instruct = points
+    if raspberry_pi:
+      self.ScALP_display.display_single_instruction(instruct=xy_instruction.instruct, display_time=5)
+    else:
+      print("Not connected to display, plotting")
+      self.ScALP_display.plot_single_instruction(instruct=xy_instruction.instruct)
+    # while True:
+    #   for count, point in enumerate(x, 0):
+    #     x_val = int(x[count]) + 4096
+    #     x_b_val = f'{x_val:016b}'
+    #     hex1 = hex(int(x_b_val[0:8], 2))
+    #     hex2 = hex(int(x_b_val[8:16], 2))
+    #     hex1 = int(hex1, 16)
+    #     hex2 = int(hex2, 16)
+    #     spi1.writebytes([hex1, hex2])
+    #     y_val = int(y[count]) + 36864
+    #     y_b_val = f'{y_val:016b}'
+    #     hex1 = hex(int(y_b_val[0:8], 2))
+    #     hex2 = hex(int(y_b_val[8:16], 2))
+    #     hex1 = int(hex1, 16)
+    #     hex2 = int(hex2, 16)
+    #     spi1.writebytes([hex1, hex2])
+
 
   def do_information(self, arg):
     """
-    Get info on an image
+    Get information on a saved image
     """
     frame = cv2.imread('./whitestar.jpg', cv2.IMREAD_GRAYSCALE)
     scale_percent = 30 # percent of original size
@@ -202,7 +184,7 @@ class ScALP(cmd.Cmd):
     """
     reads image, creates point list
     """
-    img = cv2.imread("./whitestar.jpg", cv2.IMREAD_UNCHANGED)
+    img = cv2.imread("./media/whitestar.jpg", cv2.IMREAD_UNCHANGED)
     img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imshow("example", img_grey)
     thresh = 100
@@ -276,10 +258,19 @@ class ScALP(cmd.Cmd):
     """
     Test thresholding to determine outline points
     """
+    print("Testing limits")
+    scalp_limit_and_color_instruction = ins.Instruction()
+    display_time = 5 # five seconds
+    bounding_box_and_cross_instruction = [[0, 0], [1000, 1000], [1000, 0], [0, 1000], 
+      [0, 0], [1000, 0], [1000, 1000], [0, 1000]]
     
-    pass
+    scalp_limit_and_color_instruction.instruct = bounding_box_and_cross_instruction
+    self.ScALP_display.display_single_instruction(instruct=scalp_limit_and_color_instruction.instruct, display_time=5)
 
   def do_message(self, arg):
+    """
+    Write a string of characters
+    """
     scalp_ms = ms.Message()
     scalp_ms.get_message()
 

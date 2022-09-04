@@ -27,10 +27,12 @@ class Display:
 
     def display_single_instruction(self, instruct, display_time, color_list=None):
         # Given single instruction, display for $display_time seconds
+        x = [item[0] for item in instruct]
+        y = [item[1] for item in instruct]
+        print(x)
+        
         if raspberry_pi:
             # If color_list = None, use default color for all points
-            x = list(instruct[:, 0])
-            y = list(instruct[:, 1])
             t_end = time.time() + display_time
             while time.time() < t_end:
                 for count, point in enumerate(x, 0):
@@ -50,6 +52,11 @@ class Display:
                     spi1.writebytes([hex1, hex2])
         else:
             print("System is not setup to run Display functions")
+            print("Showing plot of projected results")
+            plt.figure(1)
+            plt.plot(x, y)
+            plt.show()
+            plt.close()
             return -1
 
 
