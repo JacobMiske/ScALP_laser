@@ -96,8 +96,9 @@ class Display:
         y = list(instruct[:, 1])
         plt.figure()
         plt.scatter(x, y)
-        plt.show()
-        plt.close()
+        plt.show(block=False)
+        plt.pause(2) # 3 seconds, I use 1 usually
+        plt.close("all")
 
 
     def plot_series_of_instructions(self, instruct_series):

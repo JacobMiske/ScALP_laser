@@ -9,6 +9,7 @@ class Frame:
 
     def __init__(self):
         self.count = 0
+    
 
     def get_contour_of_image(self, image_path):
         img = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
@@ -28,6 +29,7 @@ class Frame:
                 len_longest_contour = len(contour[0])
             contour_count += 1
         return contours[longest_contour]
+
 
     def get_instruction_from_contour(self, contour):
         new_instruction_list = []
@@ -76,12 +78,13 @@ class Frame:
         result.release()
         cv2.destroyAllWindows()
 
+
     def convert_instruction_to_equal_spacing(self, contour_points):
         xs = []
         ys = []
         for i in contour_points:
-            xs.append(i[0])
-            ys.append(i[1])
+            xs.append(i[0][0])
+            ys.append(i[0][1])
         # closed contour from xc and yc
         xc = xs + [xs[0]]
         yc = ys + [ys[0]]
@@ -95,12 +98,24 @@ class Frame:
         N = 50
         ds = perimeter / N
         dSi = [ds*i for i in range(0, N)]
-        xi = []
-        yi = []
-        dSi[-1] = dSi[-1] - 0.005
+        # xi = []
+        # yi = []
+        # dSi[-1] = dSi[-1] - 0.005
         xi = np.interp(dSi, d, xc)
         yi = np.interp(dSi, d, yc)
         instruction_list_format = []
         for count, element in enumerate(xi, 0):
             instruction_list_format.append([xi[count], yi[count]])
         return instruction_list_format
+
+
+    def get_index_of_longest_contour(self, ctours):
+        # Given contours object, returns index of contours[0] that is longest
+        index = 0
+        longest_ct = 1
+        for count, ct in enumerate(ctours[0], 0):
+            ct_len = len(ct)
+            if ct_len > longest_ct:
+                longest_ct = ct_len
+                index = count
+        return index

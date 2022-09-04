@@ -1,4 +1,6 @@
 # Jacob Miske
+# This script is for running test functions
+# on the laser projector hardware
 # GPL License
 #!/usr/bin/python3
 

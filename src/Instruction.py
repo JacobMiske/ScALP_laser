@@ -9,14 +9,14 @@ class Instruction:
 
     def __init__(self):
         self.name = ""
-        # Instruction_series can either be:
+        # An instruct can either be:
         # Singular instruction, list of points in [x, y] 
         # format [[x1, y1], [x2, y2],...] OR
         # Multiple instruction, list of lists of points in [x, y]
         # format [[[x11, y11], [x12, y12],...], [[x21, y21], [x22, y22],...]]
-        self.instruction_series = []
-        # Color instruction series can either be:
-        # Singular instruction, must be same length as self.instruction_series 
+        self.instruct = []
+        # A color instruction series can either be:
+        # Singular instruction, must be same length as self.instruct 
         # [color1, color2,...]
         # Multiple instruction, list of lists of colors
         # format [[[color11], [color12],...], [[color21], [color22],...],...]
@@ -25,7 +25,7 @@ class Instruction:
 
     def set_instruction_series(self, given_series):
         # directly sets the instruction series of the Instruction object
-        self.instruction_series = given_series
+        self.instruct = given_series
 
 
     def set_color_instruction_series(self, given_color_series):
@@ -34,20 +34,20 @@ class Instruction:
 
 
     def __str__(self):
-        return str(self.instruction_series)
+        return str(self.instruct)
 
 
     def get_instruction_size(self):
         print("Number of instructions in instruction series: ")
-        print(len(self.instruction_series))
+        print(len(self.instruct))
         print("Number of points in first instruction")
-        print(len(self.instruction_series[0]))
+        print(len(self.instruct[0]))
 
 
     def append(self, point):
-        # given a point, adds to end of self.instruction_series
+        # given a point, adds to end of self.instruct
         # point should be list with int X and Y -> [X, Y]
-        self.instruction_series.append(point)
+        self.instruct.append(point)
         return 0
 
 
@@ -76,14 +76,14 @@ class Instruction:
                 contour_count += 1
             l_contour = contours[longest_contour]
             l_contour = l_contour[0]
-            self.instruction_series.append(l_contour[:, :2])
+            self.instruct.append(l_contour[:, :2])
         return 0
 
 
     def plot_instruction(self):
         # For the first set of points in the instruction series, 
         plt.figure(1)
-        plt.scatter(self.instruction_series[:, 0], self.instruction_series[:, 1])
+        plt.scatter(self.instruct[:, 0], self.instruct[:, 1])
         plt.xlim([0, 1200])
         plt.ylim([0, 1200])
         plt.savefig("./instruction_plots/instruction.png")
@@ -92,7 +92,7 @@ class Instruction:
 
     def plot_instruction_series(self):
         # For each individual set of points in the instruction series, plot and save
-        for count, instruct in enumerate(self.instruction_series, 0):
+        for count, instruct in enumerate(self.instruct, 0):
             plt.figure(count)
             plt.figure(100)
             plt.scatter(instruct[0][:, 0], instruct[0][:, 1])

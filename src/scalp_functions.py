@@ -1,4 +1,4 @@
-# Legacy code
+# Legacy code, written to understand spi write and chip operation
 import time
 import cv2
 import scipy.ndimage as ndimage
@@ -42,6 +42,8 @@ def set_int_to_DAC():
     print(hex2)
     #spi1.writebytes([hex1, hex2])
     time.sleep(0.005)
+
+
 def do_xy(self, arg):
     """
     For each frame in background and foreground, subtract, Canny edge detection, find contours, get x-y
@@ -95,49 +97,49 @@ def do_xy(self, arg):
     cv2.destroyAllWindows()
 
 
-  def do_xyRGB(self, arg):
-    """
-    Similar to do_xy but looks at whole RGB
-    """
-    back = cv2.VideoCapture('./background_video.avi')
-    fore = cv2.VideoCapture('./foreground_video.avi')
-    back_frames = []
-    fore_frames = []
-    diff_frames = []
-    for i in range(60):
-      _, back_frame = back.read()
-      _, fore_frame = fore.read()
-      back_frames.append(back_frame)
-      fore_frames.append(fore_frame)
-    threshold = 110
-    for i in range(0, 5):
-      print("frame: " + str(i))
-      f_frame = fore_frames[i]
-      b_frame = back_frames[i]
-      diff_frame = np.zeros(shape=(720, 1280))
-      for x in range(0, 720):
-        for y in range(0, 1280):
-          red_pixel = abs(int(f_frame[x, y][0]) - int(b_frame[x,y][0]))
-          green_pixel = abs(int(f_frame[x, y][1]) - int(b_frame[x,y][1]))
-          blue_pixel = abs(int(f_frame[x, y][2]) - int(b_frame[x,y][2]))
-          pixel_diff = red_pixel + green_pixel + blue_pixel
-          if abs(pixel_diff) > threshold:
-            diff_frame[x, y] = 255
-      diff_frames.append(diff_frame)
-    cv2.imwrite('./diff_frame.jpg', diff_frames[0])
-    labeled_image, nb_labels = ndimage.label(diff_frames[-1], structure=np.ones((3,3)))
-    sizes = ndimage.sum(diff_frames[-1], labeled_image, range(nb_labels + 1))
-    sizes = list(sizes)
-    main_label = max(sizes)
-    res_list = [i for i, value in enumerate(sizes) if value == main_label]
-    main_label = res_list[0]
+def do_xyRGB(self, arg):
+  """
+  Similar to do_xy but looks at whole RGB
+  """
+  back = cv2.VideoCapture('./background_video.avi')
+  fore = cv2.VideoCapture('./foreground_video.avi')
+  back_frames = []
+  fore_frames = []
+  diff_frames = []
+  for i in range(60):
+    _, back_frame = back.read()
+    _, fore_frame = fore.read()
+    back_frames.append(back_frame)
+    fore_frames.append(fore_frame)
+  threshold = 110
+  for i in range(0, 5):
+    print("frame: " + str(i))
+    f_frame = fore_frames[i]
+    b_frame = back_frames[i]
+    diff_frame = np.zeros(shape=(720, 1280))
     for x in range(0, 720):
       for y in range(0, 1280):
-        if labeled_image[x, y] != main_label:
-          labeled_image[x, y] = 0
-        else:
-          labeled_image[x, y] = 255
-    cv2.imwrite('./labels_RGB.jpg', labeled_image)
-    image_bw = ndimage.binary_fill_holes(labeled_image).astype(int)
-    cv2.imwrite('./label_bw_filled_in_RGB.jpg', image_bw)
-    cv2.destroyAllWindows()
+        red_pixel = abs(int(f_frame[x, y][0]) - int(b_frame[x,y][0]))
+        green_pixel = abs(int(f_frame[x, y][1]) - int(b_frame[x,y][1]))
+        blue_pixel = abs(int(f_frame[x, y][2]) - int(b_frame[x,y][2]))
+        pixel_diff = red_pixel + green_pixel + blue_pixel
+        if abs(pixel_diff) > threshold:
+          diff_frame[x, y] = 255
+    diff_frames.append(diff_frame)
+  cv2.imwrite('./diff_frame.jpg', diff_frames[0])
+  labeled_image, nb_labels = ndimage.label(diff_frames[-1], structure=np.ones((3,3)))
+  sizes = ndimage.sum(diff_frames[-1], labeled_image, range(nb_labels + 1))
+  sizes = list(sizes)
+  main_label = max(sizes)
+  res_list = [i for i, value in enumerate(sizes) if value == main_label]
+  main_label = res_list[0]
+  for x in range(0, 720):
+    for y in range(0, 1280):
+      if labeled_image[x, y] != main_label:
+        labeled_image[x, y] = 0
+      else:
+        labeled_image[x, y] = 255
+  cv2.imwrite('./labels_RGB.jpg', labeled_image)
+  image_bw = ndimage.binary_fill_holes(labeled_image).astype(int)
+  cv2.imwrite('./label_bw_filled_in_RGB.jpg', image_bw)
+  cv2.destroyAllWindows()
