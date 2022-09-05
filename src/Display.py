@@ -1,6 +1,7 @@
 # The Display class is handed Instructions and sends necessary 
 # commands to the laser controller over a SPI bus
 import time
+from typing import final
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -28,43 +29,10 @@ class Display:
     def display_single_instruction(self, instruct, display_time, color_list=None):
         # Given single instruction, display for $display_time seconds
         x = [item[0] for item in instruct]
-        y = [item[1] for item in instruct]
-        print(x)
-        
-        if raspberry_pi:
-            # If color_list = None, use default color for all points
-            t_end = time.time() + display_time
-            while time.time() < t_end:
-                for count, point in enumerate(x, 0):
-                    x_val = int(x[count]) + 4096
-                    x_b_val = f'{x_val:016b}'
-                    hex1 = hex(int(x_b_val[0:8], 2))
-                    hex2 = hex(int(x_b_val[8:16], 2))
-                    hex1 = int(hex1, 16)
-                    hex2 = int(hex2, 16)
-                    spi1.writebytes([hex1, hex2])
-                    y_val = int(y[count]) + 36864
-                    y_b_val = f'{y_val:016b}'
-                    hex1 = hex(int(y_b_val[0:8], 2))
-                    hex2 = hex(int(y_b_val[8:16], 2))
-                    hex1 = int(hex1, 16)
-                    hex2 = int(hex2, 16)
-                    spi1.writebytes([hex1, hex2])
-        else:
-            print("System is not setup to run Display functions")
-            print("Showing plot of projected results")
-            plt.figure(1)
-            plt.plot(x, y)
-            plt.show()
-            plt.close()
-            return -1
-
-
-    def display_series_of_instructions(self, instruct_series, display_time):
-        if raspberry_pi:
-            for instruct in instruct_series:
-                x = list(instruct[0][:, 0])
-                y = list(instruct[0][:, 1])
+        y = [item[1] for item in instruct]        
+        try:
+            if raspberry_pi:
+                # If color_list = None, use default color for all points
                 t_end = time.time() + display_time
                 while time.time() < t_end:
                     for count, point in enumerate(x, 0):
@@ -82,10 +50,63 @@ class Display:
                         hex1 = int(hex1, 16)
                         hex2 = int(hex2, 16)
                         spi1.writebytes([hex1, hex2])
+            else:
+                print("System is not setup to run Display functions")
+                print("Showing plot of projected results")
+                plt.figure(1)
+                plt.plot(x, y)
+                plt.show(block=False)
+                plt.pause(1) # show for 1 second
+                plt.close("all")
+        except:
+            print("Error in frame display function")
+        finally: 
             return 0
-        else:
-            print("System is not setup to run Display functions")
+
+
+    def display_series_of_instructions(self, instruct_series, display_time):
+        """
+        
+        """
+        try:
+            if raspberry_pi:
+                for instruct in instruct_series:
+                    x = list(instruct[0][:, 0])
+                    y = list(instruct[0][:, 1])
+                    t_end = time.time() + display_time
+                    while time.time() < t_end:
+                        for count, point in enumerate(x, 0):
+                            x_val = int(x[count]) + 4096
+                            x_b_val = f'{x_val:016b}'
+                            hex1 = hex(int(x_b_val[0:8], 2))
+                            hex2 = hex(int(x_b_val[8:16], 2))
+                            hex1 = int(hex1, 16)
+                            hex2 = int(hex2, 16)
+                            spi1.writebytes([hex1, hex2])
+                            y_val = int(y[count]) + 36864
+                            y_b_val = f'{y_val:016b}'
+                            hex1 = hex(int(y_b_val[0:8], 2))
+                            hex2 = hex(int(y_b_val[8:16], 2))
+                            hex1 = int(hex1, 16)
+                            hex2 = int(hex2, 16)
+                            spi1.writebytes([hex1, hex2])
+            else:
+                # Get first frame xs and ys
+                x = [item[0] for item in instruct_series[0]]
+                y = [item[1] for item in instruct_series[0]]
+                print("System is not setup to run Display functions")
+                print("Showing plot of first frame")
+                plt.figure(1)
+                plt.plot(x, y)
+                plt.show(block=False)
+                plt.pause(1) # show for 1 second
+                plt.close("all")
+            return 0
+        except:
+            print("Error in series display function")
             return -1
+        finally: 
+            return 0
 
 
     def plot_single_instruction(self, instruct):
@@ -97,9 +118,22 @@ class Display:
         plt.figure()
         plt.scatter(x, y)
         plt.show(block=False)
-        plt.pause(2) # 3 seconds, I use 1 usually
+        plt.pause(1) # show for 1 second
         plt.close("all")
 
 
     def plot_series_of_instructions(self, instruct_series):
-        pass
+        """
+        Show each frame for 1 second
+        """
+        for instruct in instruct_series:
+            # use array for easy indexing
+            instruct = np.array(instruct)
+            # X values as first column, Y values as second column
+            x = list(instruct[:, 0])
+            y = list(instruct[:, 1])
+            plt.figure()
+            plt.scatter(x, y)
+            plt.show(block=False)
+            plt.pause(1) # show for 1 second
+            plt.close("all")

@@ -9,6 +9,7 @@ class Message:
 
     def __init__(self):
         self.message = ""
+        self.message_instuction = []
 
     def get_message(self):
         user_message = input("Please provide a short string of characters: ")

@@ -1,6 +1,7 @@
 # The Frame class is for generating contours and 
 # instructions for single frame photos and images
 
+import os
 import cv2
 import numpy as np
 from src import Instruction as ins
@@ -119,3 +120,71 @@ class Frame:
                 longest_ct = ct_len
                 index = count
         return index
+
+
+    def set_current_video_frame_diffs(self, video_location: str):
+        capture = cv2.VideoCapture(video_location)
+        count = 0
+        for i in range(200):
+            ret1, frame1 = capture.read()
+            ret2, frame2 = capture.read()
+            try:
+                frame_diff = frame2 - frame1
+                # cv2.imshow("example diff", frame_diff)
+                cv2.imwrite("./current_video_frame_diffs/frame_d%d.jpg" % count, frame_diff)
+            except:
+                print("frame did not compute")
+            count += 1
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
+        capture.release()
+        cv2.destroyAllWindows() # destroy all opened windows
+    
+
+    def set_current_video_frame_threshs(self):
+        frame_diff_directory = "./current_video_frame_diffs/"
+        count = 0
+        files = os.listdir(frame_diff_directory)
+        files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
+        img_files = list(filter(lambda x: '.jpg' in x, files))
+        for f in img_files:
+            print(f)
+            image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
+            img_grey =  cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+            thresh = 10
+            ret, thresh_img = cv2.threshold(img_grey, thresh, 255, cv2.THRESH_BINARY)
+            # cv2.imshow("thresh test", thresh_img)
+            cv2.imwrite("./current_video_frame_threshs/frame_d%d.jpg" % count, thresh_img)
+            count += 1
+        cv2.destroyAllWindows() # destroy all opened windows
+        return 0
+
+
+    def get_instruction_series_from_video_frames(self, diffs_directory):
+        video_instruction_series = []
+        # grab all files in directory
+        files = os.listdir(diffs_directory)
+        # sort by number on end of filename
+        files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
+        img_files = list(filter(lambda x: '.jpg' in x, files))
+        # For each image in the folder, find and store the longest contour
+        for img in img_files:
+            path = diffs_directory + img
+            img_read = cv2.imread(path)
+            img_grey = cv2.cvtColor(img_read, cv2.COLOR_BGR2GRAY)
+            contours = cv2.findContours(img_grey, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            last_element_index = len(contours)-1
+            contours = contours[:last_element_index]
+            # Return largest contour found
+            contour_count = 0
+            longest_contour = 0
+            len_longest_contour = 0
+            for contour in contours:
+                if len(contour[0]) > len_longest_contour:
+                    longest_contour = contour_count
+                    len_longest_contour = len(contour[0])
+                contour_count += 1
+            l_contour = contours[longest_contour]
+            l_contour = l_contour[0]
+            video_instruction_series.append(l_contour[:, :2])
+        return video_instruction_series

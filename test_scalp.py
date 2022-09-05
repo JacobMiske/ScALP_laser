@@ -114,8 +114,45 @@ def get_frames_diff_from_video():
         # cv2.imshow("thresh test", thresh_img)
         cv2.imwrite("./current_video_frame_threshs/frame_d%d.jpg" % count, thresh_img)
         count += 1
+    cv2.destroyAllWindows() # destroy all opened windows
     return 0
         
+
+def set_current_video_frame_diffs():
+    cap = cv2.VideoCapture("./media/ball.mp4")
+    count = 0
+    for i in range(200):
+        ret1, frame1 = cap.read()
+        ret2, frame2 = cap.read()
+        try:
+            frame_diff = frame2 - frame1
+            # cv2.imshow("example diff", frame_diff)
+            cv2.imwrite("./current_video_frame_diffs/frame_d%d.jpg" % count, frame_diff)
+        except:
+            print("frame did not compute")
+        count += 1
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows() # destroy all opened windows
+
+
+def set_current_video_frame_threshs():
+    frame_diff_directory = "./current_video_frame_diffs/"
+    count = 0
+    files = os.listdir(frame_diff_directory)
+    files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
+    img_files = list(filter(lambda x: '.jpg' in x, files))
+    for f in img_files:
+        print(f)
+        image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
+        img_grey =  cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+        thresh = 10
+        ret, thresh_img = cv2.threshold(img_grey, thresh, 255, cv2.THRESH_BINARY)
+        # cv2.imshow("thresh test", thresh_img)
+        cv2.imwrite("./current_video_frame_threshs/frame_d%d.jpg" % count, thresh_img)
+        count += 1
+    return 0
 
 
 def get_contour_instructions_per_frame():

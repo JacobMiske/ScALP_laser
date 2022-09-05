@@ -51,35 +51,6 @@ class Instruction:
         return 0
 
 
-    def get_instruction_series_from_video_frames(self, directory):
-        # grab all files in directory
-        files = os.listdir(directory)
-        # sort by number on end of filename
-        files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
-        img_files = list(filter(lambda x: '.jpg' in x, files))
-        # For each image in the folder, find and store the longest contour
-        for img in img_files:
-            path = directory + img
-            img_read = cv2.imread(path)
-            img_grey = cv2.cvtColor(img_read, cv2.COLOR_BGR2GRAY)
-            contours = cv2.findContours(img_grey, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            last_element_index = len(contours)-1
-            contours = contours[:last_element_index]
-            # Return largest contour found
-            contour_count = 0
-            longest_contour = 0
-            len_longest_contour = 0
-            for contour in contours:
-                if len(contour[0]) > len_longest_contour:
-                    longest_contour = contour_count
-                    len_longest_contour = len(contour[0])
-                contour_count += 1
-            l_contour = contours[longest_contour]
-            l_contour = l_contour[0]
-            self.instruct.append(l_contour[:, :2])
-        return 0
-
-
     def plot_instruction(self):
         # For the first set of points in the instruction series, 
         plt.figure(1)
@@ -87,7 +58,9 @@ class Instruction:
         plt.xlim([0, 1200])
         plt.ylim([0, 1200])
         plt.savefig("./instruction_plots/instruction.png")
-        plt.close
+        plt.show(block=False)
+        plt.pause(1) # show for 1 second
+        plt.close("all")
     
 
     def plot_instruction_series(self):
@@ -99,4 +72,6 @@ class Instruction:
             plt.xlim([0, 1200])
             plt.ylim([0, 1200])
             plt.savefig("./instruction_plots/instruction_plot_{}.jpg".format(count))
-            plt.close()
+            plt.show(block=False)
+            plt.pause(1) # show for 1 second
+            plt.close("all")

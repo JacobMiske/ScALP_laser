@@ -171,10 +171,10 @@ class ScALP(cmd.Cmd):
 
   def do_image(self, arg):
     """
-    Reads image, creates point list
+    Reads image, creates point list for image, projects
     """
-    img_location = input("Provide file name with extension: ")
-    file = "./media/" + img_location
+    img_name = input("Provide file name with extension: ")
+    file = "./media/" + img_name
     print(file)
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)
     img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -196,21 +196,44 @@ class ScALP(cmd.Cmd):
       self.ScALP_display.plot_single_instruction(instruct=image_instruction.instruct)
 
 
+  def do_video(self, arg):
+    """
+    Reads video, creates point list for each frame, projects
+    """
+    # Get video file
+    video_name = input("Provide file name with extension: ")
+    file = "./media/" + video_name
+    print(file)
+    # Convert video to series of instructions for laser system
+    # Step 1: frame by frame, cut video into jpgs and save to current_video_frames
+    self.ScALP_frame.set_current_video_frame_diffs(video_location=file)
+    # Step 2: frame by frame, get diffs between frames and convert into threshs
+    self.ScALP_frame.set_current_video_frame_threshs()
+    video_instruction_series = self.ScALP_frame.get_instruction_series_from_video_frames(directory=file_dir)
+
+    scalp_instruction_set = ins.Instruction()
+    scalp_instruction_set.instruct = video_instruction_series
+    print(scalp_instruction_set.instruct[1])
+    if raspberry_pi:
+      self.ScALP_display.display_series_of_instructions(instruct_series=scalp_instruction_set.instruct, display_time=1)
+    else:
+      print("Not connected to display, plotting")
+      self.ScALP_display.plot_series_of_instructions(instruct_series=scalp_instruction_set.instruct)
+
+
   def do_threshold(self, arg):
     """
-    Test thresholding to determine outline points
+    Test limits of the laser projection
     """
     print("Testing limits")
     scalp_limit_and_color_instruction = ins.Instruction()
-    display_time = 5 # five seconds
     bounding_box_and_cross_instruction = [[0, 0], [1000, 1000], [1000, 0], [0, 1000], 
       [0, 0], [1000, 0], [1000, 1000], [0, 1000]]
-    
     scalp_limit_and_color_instruction.instruct = bounding_box_and_cross_instruction
     if raspberry_pi:
       self.ScALP_display.display_single_instruction(instruct=scalp_limit_and_color_instruction.instruct, display_time=5)
     else: 
-      print("Not connected to display, plotting")
+      print("Not connected to display, plotting instruction")
       self.ScALP_display.plot_single_instruction(instruct=scalp_limit_and_color_instruction.instruct)
 
 
@@ -220,6 +243,14 @@ class ScALP(cmd.Cmd):
     """
     scalp_ms = ms.Message()
     scalp_ms.get_message()
+    scalp_message_instruction = ins.Instruction()
+    scalp_message_instruction.instruct = scalp_ms.message_instuction
+    if raspberry_pi:
+      self.ScALP_display.display_single_instruction(instruct=scalp_message_instruction.instruct, display_time=5)
+    else: 
+      print("Not connected to display, plotting instruction message")
+      self.ScALP_display.plot_single_instruction(instruct=scalp_message_instruction.instruct)
+
 
   def do_bye(self, arg):
     """
