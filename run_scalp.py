@@ -34,7 +34,7 @@ if raspberry_pi:
   spi2.max_speed_hz = 250000
 else:
   print("WARNING")
-  print("System is not setup to laser system, software will plot instead of drive laser")
+  print("System is not setup to laser system, software will plot locally instead of drive laser")
 
 
 class ScALP(cmd.Cmd):
@@ -201,16 +201,16 @@ class ScALP(cmd.Cmd):
     Reads video, creates point list for each frame, projects
     """
     # Get video file
-    video_name = input("Provide file name with extension: ")
-    file = "./media/" + video_name
-    print(file)
+    video_name = "ball.mp4"#input("Provide file name with extension: ")
+    file_dir = "./media/" + video_name
+    print(file_dir)
     # Convert video to series of instructions for laser system
     # Step 1: frame by frame, cut video into jpgs and save to current_video_frames
-    self.ScALP_frame.set_current_video_frame_diffs(video_location=file)
+    self.ScALP_frame.set_current_video_frame_diffs(video_location=file_dir)
     # Step 2: frame by frame, get diffs between frames and convert into threshs
     self.ScALP_frame.set_current_video_frame_threshs()
-    video_instruction_series = self.ScALP_frame.get_instruction_series_from_video_frames(directory=file_dir)
-
+    video_instruction_series = self.ScALP_frame.get_instruction_series_from_video_frames(threshs_directory="./current_video_frame_threshs/")
+    # print(video_instruction_series)
     scalp_instruction_set = ins.Instruction()
     scalp_instruction_set.instruct = video_instruction_series
     print(scalp_instruction_set.instruct[1])

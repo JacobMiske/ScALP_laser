@@ -110,6 +110,10 @@ class Display:
 
 
     def plot_single_instruction(self, instruct):
+        """
+        Show one frame for 1 second
+        :param instruct: an Instruction.instruct list of lists [x, y] format
+        """
         # use array for easy indexing
         instruct = np.array(instruct)
         # X values as first column, Y values as second column
@@ -126,7 +130,7 @@ class Display:
         """
         Show each frame for 1 second
         """
-        for instruct in instruct_series:
+        for instruct in instruct_series[0]:
             # use array for easy indexing
             instruct = np.array(instruct)
             # X values as first column, Y values as second column
@@ -136,4 +140,4 @@ class Display:
             plt.scatter(x, y)
             plt.show(block=False)
             plt.pause(1) # show for 1 second
-            plt.close("all")
+            plt.close()

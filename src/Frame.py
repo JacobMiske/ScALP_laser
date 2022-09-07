@@ -5,11 +5,13 @@ import os
 import cv2
 import numpy as np
 from src import Instruction as ins
+from src import Display as disp
 
 class Frame:
 
     def __init__(self):
         self.count = 0
+        self.test_display = disp.Display()
     
 
     def get_contour_of_image(self, image_path):
@@ -19,7 +21,7 @@ class Frame:
         ret, thresh_img = cv2.threshold(img_grey, thresh, 255, cv2.THRESH_BINARY)
         contours = cv2.findContours(thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         img_contours = np.zeros(img_grey.shape)
-        cv2.imwrite('./contours.png',img_contours)
+        # cv2.imwrite('./contours.png',img_contours)
         # Return largest contour found
         contour_count = 0
         longest_contour = 0
@@ -42,7 +44,7 @@ class Frame:
         new_instruction_list = self.convert_instruction_to_equal_spacing(contour_points=new_instruction_list)
         new_ins = ins.Instruction()
         new_ins.instruct = np.asarray(a=new_instruction_list)
-        return new_ins
+        return new_ins, np.asarray(a=new_instruction_list)
 
 
     def set_frame(self):
@@ -133,7 +135,7 @@ class Frame:
                 # cv2.imshow("example diff", frame_diff)
                 cv2.imwrite("./current_video_frame_diffs/frame_d%d.jpg" % count, frame_diff)
             except:
-                print("frame did not compute")
+                print("Diff did not compute for frame: {}".format(i))
             count += 1
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
@@ -160,16 +162,16 @@ class Frame:
         return 0
 
 
-    def get_instruction_series_from_video_frames(self, diffs_directory):
+    def get_instruction_series_from_video_frames(self, threshs_directory):
         video_instruction_series = []
         # grab all files in directory
-        files = os.listdir(diffs_directory)
+        files = os.listdir(threshs_directory)
         # sort by number on end of filename
         files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
         img_files = list(filter(lambda x: '.jpg' in x, files))
         # For each image in the folder, find and store the longest contour
         for img in img_files:
-            path = diffs_directory + img
+            path = threshs_directory + img
             img_read = cv2.imread(path)
             img_grey = cv2.cvtColor(img_read, cv2.COLOR_BGR2GRAY)
             contours = cv2.findContours(img_grey, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -186,5 +188,8 @@ class Frame:
                 contour_count += 1
             l_contour = contours[longest_contour]
             l_contour = l_contour[0]
-            video_instruction_series.append(l_contour[:, :2])
+            frame_instruction_series = l_contour[:, :2]
+            print(frame_instruction_series[0])
+            self.test_display.plot_single_instruction(instruct=frame_instruction_series[0])
+            video_instruction_series.append(frame_instruction_series[0])
         return video_instruction_series
