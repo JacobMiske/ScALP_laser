@@ -265,5 +265,26 @@ def plot_longest_contours_in_frame(c_points):
     plt.close()
     return 0
 
+
+def get_circle_on_binary_2D_array(array_size, center, radius):
+    """
+    :param array_size: tuple of format (x, y)
+    :param center: tuple of format (x, y)
+    :param radius: integer
+    Returns numpy array with circles of ones on background of zeros
+    """
+    center_x = center[0]
+    center_y = center[1]
+    temp_array = np.zeros(array_size)
+    for i in range(array_size[0]):
+        for j in range(array_size[1]):
+            distance_to_ij = np.sqrt((i - center_x)**2 + (j - center_y)**2)
+            if distance_to_ij < radius:
+                temp_array[i, j] = 1
+    # cv2.imshow('circle test', temp_array)
+    # cv2.waitKey(0)
+    return temp_array
+
+
 if __name__ == '__main__':
     main()

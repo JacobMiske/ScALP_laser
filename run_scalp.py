@@ -39,7 +39,7 @@ else:
 
 class ScALP(cmd.Cmd):
   custom_fig = Figlet(font='slant')
-  intro = 'Welcome to the ScALP CLI for Raspberry Pi \n'
+  intro = 'Welcome to the ScALP CLI \n'
   prompt = '> '
   file = None
   print(custom_fig.renderText(' ScALP '))
@@ -178,13 +178,15 @@ class ScALP(cmd.Cmd):
     print(file)
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)
     img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow("example", img_grey)
     thresh = 100
     ret, thresh_img = cv2.threshold(img_grey, thresh, 255, cv2.THRESH_BINARY)
+    thresh_img = cv2.bitwise_not(img_grey)
     contours = cv2.findContours(thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # contours[0] is a list of all the contours with points for each
     ctour_points = contours[0]
+    # From this list of contours, isolate the longest one (most points)
     ctour_of_interest_index = self.ScALP_frame.get_index_of_longest_contour(ctours=contours)
-    # Now find equally spaced points along contours[0]
+    # Find a list of 50 equally spaced points along the longest contours in the image
     ctour_points_equally_spaced = self.ScALP_frame.convert_instruction_to_equal_spacing(contour_points=ctour_points[ctour_of_interest_index])
     image_instruction = ins.Instruction()
     image_instruction.instruct = ctour_points_equally_spaced
@@ -262,8 +264,8 @@ class ScALP(cmd.Cmd):
 
   def close(self):
     if self.file:
-        self.file.close()
-        self.file = None
+      self.file.close()
+      self.file = None
 
 
 if __name__ == '__main__':

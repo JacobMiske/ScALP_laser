@@ -1,9 +1,10 @@
-# The Display class is handed Instructions and sends necessary 
+# The Display class is handed Instructions and sends necessary
 # commands to the laser controller over a SPI bus
 import time
 from typing import final
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as image
 
 raspberry_pi = False
 
@@ -29,7 +30,7 @@ class Display:
     def display_single_instruction(self, instruct, display_time, color_list=None):
         # Given single instruction, display for $display_time seconds
         x = [item[0] for item in instruct]
-        y = [item[1] for item in instruct]        
+        y = [item[1] for item in instruct]
         try:
             if raspberry_pi:
                 # If color_list = None, use default color for all points
@@ -60,13 +61,13 @@ class Display:
                 plt.close("all")
         except:
             print("Error in frame display function")
-        finally: 
+        finally:
             return 0
 
 
     def display_series_of_instructions(self, instruct_series, display_time):
         """
-        
+
         """
         try:
             if raspberry_pi:
@@ -105,7 +106,7 @@ class Display:
         except:
             print("Error in series display function")
             return -1
-        finally: 
+        finally:
             return 0
 
 
@@ -114,15 +115,20 @@ class Display:
         Show one frame for 1 second
         :param instruct: an Instruction.instruct list of lists [x, y] format
         """
+        # Read photo to overlay in background of plot
+        # photo = image.imread("./media/bug.jpg")
         # use array for easy indexing
         instruct = np.array(instruct)
         # X values as first column, Y values as second column
         x = list(instruct[:, 0])
         y = list(instruct[:, 1])
         plt.figure()
-        plt.scatter(x, y)
+        plt.plot(x, y)
+        # plt.imshow(photo)
+        plt.xlim([0, max(x)])
+        plt.ylim([0, max(y)])
         plt.show(block=False)
-        plt.pause(1) # show for 1 second
+        plt.pause(5) # show for 5 seconds
         plt.close("all")
 
 
@@ -138,6 +144,8 @@ class Display:
             y = list(instruct[:, 1])
             plt.figure()
             plt.scatter(x, y)
+            plt.xlim([0, 1500])
+            plt.ylim([0, 1500])
             plt.show(block=False)
             plt.pause(1) # show for 1 second
             plt.close()
