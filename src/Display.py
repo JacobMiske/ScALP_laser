@@ -99,6 +99,8 @@ class Display:
                 print("Showing plot of first frame")
                 plt.figure(1)
                 plt.plot(x, y)
+                # plt.xlim([0, 1500])
+                # plt.ylim([0, 1500])
                 plt.show(block=False)
                 plt.pause(1) # show for 1 second
                 plt.close("all")
@@ -136,12 +138,13 @@ class Display:
         """
         Show each frame for 1 second
         """
-        for instruct in instruct_series[0]:
+        for instruct in instruct_series:
             # use array for easy indexing
-            instruct = np.array(instruct)
+            single_instruct = np.array(instruct)
+            print(single_instruct)
             # X values as first column, Y values as second column
-            x = list(instruct[:, 0])
-            y = list(instruct[:, 1])
+            x = list(single_instruct[:, 0])
+            y = list(single_instruct[:, 1])
             plt.figure()
             plt.scatter(x, y)
             plt.xlim([0, 1500])

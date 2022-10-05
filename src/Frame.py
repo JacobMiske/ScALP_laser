@@ -148,14 +148,31 @@ class Frame:
     return index
 
 
+  def set_noise_pixels_to_black(self, f_diff):
+    """
+    Input a np.ndarray of RGB values from opencv2 two capture.read() diff
+    Return a np.ndarray of RBG values with low magnitude noise set to black (0,0,0)
+    """
+    print("hello")
+    rows, cols = f_diff.shape
+
+    for i in range(rows):
+      for j in range(cols):
+        k = f_diff[i,j]
+        print(k)
+
+
   def set_current_video_frame_diffs(self, video_location: str):
     capture = cv2.VideoCapture(video_location)
     count = 0
+    # limit number of frames analyzed
     for i in range(200):
       ret1, frame1 = capture.read()
       ret2, frame2 = capture.read()
       try:
         frame_diff = frame2 - frame1
+        # print(frame_diff.shape)
+        # self.set_noise_pixels_to_black(f_diff=frame_diff)
         # cv2.imshow("example diff", frame_diff)
         cv2.imwrite("./current_video_frame_diffs/frame_d%d.jpg" % count, frame_diff)
       except:
@@ -174,7 +191,7 @@ class Frame:
     files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
     img_files = list(filter(lambda x: '.jpg' in x, files))
     for f in img_files:
-      print(f)
+      print("Processing: {}".format(f))
       image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
       img_grey =  cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
       thresh = 10
@@ -199,26 +216,13 @@ class Frame:
       img_read = cv2.imread(path)
       img_grey = cv2.cvtColor(img_read, cv2.COLOR_BGR2GRAY)
       contours = cv2.findContours(img_grey, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+      # The first element of findContours is a list of lists of contour points
       ctour_points = contours[0]
-
-      # last_element_index = len(contours)-1
-      # contours = contours[:last_element_index]
-      # Return largest contour found
-      # contour_count = 0
-      # longest_contour = 0
-      # len_longest_contour = 0
-      # for contour in contours:
-      #   if len(contour[0]) > len_longest_contour:
-      #     longest_contour = contour_count
-      #     len_longest_contour = len(contour[0])
-      #   contour_count += 1
-      # l_contour = contours[longest_contour]
-
+      # find the longest list of contours in that list and convert it to instructions
       longest_contour = self.get_index_of_longest_contour(ctours=contours)
+      # ensure the instructions are equally spaced
       l_contour = self.convert_instruction_to_equal_spacing(contour_points=ctour_points[longest_contour])
-
-      # frame_instruction_series = l_contour[:, :2]
-      # print(frame_instruction_series[0])
-      self.test_display.plot_single_instruction(instruct=l_contour)
+      # Uncomment to plot each instruction for debugging
+      # self.test_display.plot_single_instruction(instruct=l_contour)
       video_instruction_series.append(l_contour)
     return video_instruction_series

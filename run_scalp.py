@@ -205,9 +205,9 @@ class ScALP(cmd.Cmd):
     # Get video file
     video_name = "ball.mp4"#input("Provide file name with extension: ")
     file_dir = "./media/" + video_name
-    print(file_dir)
+    print("Analyzing video file: {}".format(file_dir))
     # Convert video to series of instructions for laser system
-    # Step 1: frame by frame, cut video into jpgs and save to current_video_frames
+    # Step 1: frame by frame, cut video into jpgs and save to current_video _frames
     self.ScALP_frame.set_current_video_frame_diffs(video_location=file_dir)
     # Step 2: frame by frame, get diffs between frames and convert into threshs
     self.ScALP_frame.set_current_video_frame_threshs()
@@ -215,7 +215,7 @@ class ScALP(cmd.Cmd):
     # print(video_instruction_series)
     scalp_instruction_set = ins.Instruction()
     scalp_instruction_set.instruct = video_instruction_series
-    print(scalp_instruction_set.instruct[1])
+    # print(scalp_instruction_set.instruct[1])
     if raspberry_pi:
       self.ScALP_display.display_series_of_instructions(instruct_series=scalp_instruction_set.instruct, display_time=1)
     else:
