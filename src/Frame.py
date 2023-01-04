@@ -166,7 +166,7 @@ class Frame:
     capture = cv2.VideoCapture(video_location)
     count = 0
     # limit number of frames analyzed
-    for i in range(200):
+    for i in range(300):
       ret1, frame1 = capture.read()
       ret2, frame2 = capture.read()
       try:
@@ -185,11 +185,14 @@ class Frame:
   
 
   def set_current_video_frame_threshs(self):
+    # Get directory of difference frames
     frame_diff_directory = "./current_video_frame_diffs/"
+    # initialize a frame count
     count = 0
     files = os.listdir(frame_diff_directory)
     files = sorted(files,key=lambda x: int(os.path.splitext(x[7:])[0]))
     img_files = list(filter(lambda x: '.jpg' in x, files))
+    # for each image file, get the greyscale, then evaluate it with cv2.threadhold
     for f in img_files:
       print("Processing: {}".format(f))
       image = cv2.imread(frame_diff_directory+str(f), cv2.IMREAD_COLOR)
@@ -197,6 +200,7 @@ class Frame:
       thresh = 10
       ret, thresh_img = cv2.threshold(img_grey, thresh, 255, cv2.THRESH_BINARY)
       # cv2.imshow("thresh test", thresh_img)
+      # Write the threshold frame to the threshold frame folder
       cv2.imwrite("./current_video_frame_threshs/frame_d%d.jpg" % count, thresh_img)
       count += 1
     cv2.destroyAllWindows() # destroy all opened windows
@@ -204,6 +208,7 @@ class Frame:
 
 
   def get_instruction_series_from_video_frames(self, threshs_directory):
+    # Initialize an empty list to hold each frame's instructions
     video_instruction_series = []
     # grab all files in directory
     files = os.listdir(threshs_directory)

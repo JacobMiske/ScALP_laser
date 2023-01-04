@@ -203,7 +203,7 @@ class ScALP(cmd.Cmd):
     Reads video, creates point list for each frame, projects
     """
     # Get video file
-    video_name = "ball.mp4"#input("Provide file name with extension: ")
+    video_name = "out.mp4"#input("Provide file name with extension: ")
     file_dir = "./media/" + video_name
     print("Analyzing video file: {}".format(file_dir))
     # Convert video to series of instructions for laser system
