@@ -171,6 +171,9 @@ class Frame:
       ret2, frame2 = capture.read()
       try:
         frame_diff = frame2 - frame1
+        cv2.imshow(frame_diff)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         # print(frame_diff.shape)
         # self.set_noise_pixels_to_black(f_diff=frame_diff)
         # cv2.imshow("example diff", frame_diff)
