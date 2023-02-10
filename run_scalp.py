@@ -249,7 +249,7 @@ class ScALP(cmd.Cmd):
     scalp_message_instruction = ins.Instruction()
     scalp_message_instruction.instruct = scalp_ms.message_instruction
     if raspberry_pi:
-      self.ScALP_display.display_single_instruction(instruct=scalp_message_instruction.instruct, display_time=5)
+      self.ScALP_display.display_series_of_instructions(instruct=scalp_message_instruction.instruct, display_time=5)
     else: 
       print("Not connected to display, plotting instruction message")
       self.ScALP_display.plot_series_of_instructions(instruct_series=scalp_message_instruction.instruct)

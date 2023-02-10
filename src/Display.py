@@ -71,8 +71,8 @@ class Display:
         try:
             if raspberry_pi:
                 for instruct in instruct_series:
-                    x = list(instruct[0][:, 0])
-                    y = list(instruct[0][:, 1])
+                    x = [i[0] for i in instruct]
+                    y = [i[1] for i in instruct]
                     t_end = time.time() + display_time
                     while time.time() < t_end:
                         for count, point in enumerate(x, 0):
