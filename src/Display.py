@@ -28,6 +28,7 @@ class Display:
 
     def display_single_instruction(self, instruct, display_time, color_list=None):
         # Given single instruction, display for $display_time seconds
+        print(instruct)
         x = [item[0] for item in instruct]
         y = [item[1] for item in instruct]
         try:
