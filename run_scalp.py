@@ -233,7 +233,7 @@ class ScALP(cmd.Cmd):
       [0, 0], [1000, 0], [1000, 1000], [0, 1000]]
     scalp_limit_and_color_instruction.instruct = bounding_box_and_cross_instruction
     if raspberry_pi:
-      self.ScALP_display.display_single_instruction(instruct_series=scalp_limit_and_color_instruction.instruct, display_time=1)
+      self.ScALP_display.display_single_instruction(instruct=scalp_limit_and_color_instruction.instruct, display_time=5)
     else: 
       print("Not connected to display, plotting instruction")
       self.ScALP_display.plot_single_instruction(instruct=scalp_limit_and_color_instruction.instruct)
@@ -249,7 +249,7 @@ class ScALP(cmd.Cmd):
     scalp_message_instruction = ins.Instruction()
     scalp_message_instruction.instruct = scalp_ms.message_instruction
     if raspberry_pi:
-      self.ScALP_display.display_series_of_instructions(instruct=scalp_message_instruction.instruct, display_time=5)
+      self.ScALP_display.display_series_of_instructions(instruct_series=scalp_message_instruction.instruct, display_time=1)
     else: 
       print("Not connected to display, plotting instruction message")
       self.ScALP_display.plot_series_of_instructions(instruct_series=scalp_message_instruction.instruct)
