@@ -1,7 +1,6 @@
 # The Display class is handed Instructions and sends necessary
 # commands to the laser controller over a SPI bus
 import time
-from typing import final
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as image
@@ -67,7 +66,7 @@ class Display:
 
     def display_series_of_instructions(self, instruct_series, display_time):
         """
-
+        Displays a series of instructions, i.e. video
         """
         try:
             if raspberry_pi:
@@ -138,6 +137,7 @@ class Display:
         """
         Show each frame for 1 second
         """
+        count = 0
         for instruct in instruct_series:
             # use array for easy indexing
             single_instruct = np.array(instruct)

@@ -245,13 +245,14 @@ class ScALP(cmd.Cmd):
     """
     scalp_ms = ms.Message()
     scalp_ms.get_message()
+    scalp_ms.get_instructions_for_text()
     scalp_message_instruction = ins.Instruction()
-    scalp_message_instruction.instruct = scalp_ms.message_instuction
+    scalp_message_instruction.instruct = scalp_ms.message_instruction
     if raspberry_pi:
       self.ScALP_display.display_single_instruction(instruct=scalp_message_instruction.instruct, display_time=5)
     else: 
       print("Not connected to display, plotting instruction message")
-      self.ScALP_display.plot_single_instruction(instruct=scalp_message_instruction.instruct)
+      self.ScALP_display.plot_series_of_instructions(instruct_series=scalp_message_instruction.instruct)
 
 
   def do_bye(self, arg):
